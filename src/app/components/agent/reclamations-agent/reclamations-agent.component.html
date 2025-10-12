@@ -1,0 +1,265 @@
+<!-- Sidebar Agent -->
+<div class="agent-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Agent Municipal</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/agent/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/projets" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-text">Projets</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/reclamations" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Réclamations</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/profil" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="agent-main-content">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Réclamations</h1>
+      <p>Consultez et gérez les réclamations des citoyens</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ getNouvellesReclamations() }}</span>
+        <span class="stat-label">Nouvelles</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getEnCoursReclamations() }}</span>
+        <span class="stat-label">En cours</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getTraiteesReclamations() }}</span>
+        <span class="stat-label">Traitées</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="statutFilter">Filtrer par statut :</label>
+      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterReclamations()" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="nouvelle">Nouvelles</option>
+        <option value="en_cours">En cours</option>
+        <option value="traitee">Traitées</option>
+        <option value="rejetee">Rejetées</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="prioriteFilter">Filtrer par priorité :</label>
+      <select id="prioriteFilter" [(ngModel)]="prioriteFilter" (change)="filterReclamations()" class="form-select">
+        <option value="">Toutes les priorités</option>
+        <option value="urgente">Urgente</option>
+        <option value="haute">Haute</option>
+        <option value="moyenne">Moyenne</option>
+        <option value="basse">Basse</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des réclamations -->
+  <div class="reclamations-table-container">
+    <table class="reclamations-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Sujet</th>
+          <th>Citoyen</th>
+          <th>Type</th>
+          <th>Priorité</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reclamation of filteredReclamations" class="reclamation-row" [ngClass]="'priority-' + reclamation.priorite">
+          <td class="reclamation-id">#{{ reclamation.id }}</td>
+          <td class="reclamation-sujet">{{ reclamation.sujet }}</td>
+          <td class="reclamation-citoyen">
+            <div class="citoyen-info">
+              <div class="citoyen-nom">{{ reclamation.citoyen.prenom }} {{ reclamation.citoyen.nom }}</div>
+              <div class="citoyen-email">{{ reclamation.citoyen.email }}</div>
+            </div>
+          </td>
+          <td class="reclamation-type">
+            <span class="type-badge" [ngClass]="'type-' + reclamation.type">
+              {{ getTypeLabel(reclamation.type) }}
+            </span>
+          </td>
+          <td class="reclamation-priorite">
+            <span class="priorite-badge" [ngClass]="'priorite-' + reclamation.priorite">
+              {{ getPrioriteLabel(reclamation.priorite) }}
+            </span>
+          </td>
+          <td class="reclamation-date">{{ formatDate(reclamation.dateCreation) }}</td>
+          <td class="reclamation-statut">
+            <span class="statut-badge" [ngClass]="'statut-' + reclamation.statut">
+              {{ getStatutLabel(reclamation.statut) }}
+            </span>
+          </td>
+          <td class="reclamation-actions">
+            <button class="btn btn-sm btn-info" (click)="viewReclamation(reclamation)">
+              👁️ Voir
+            </button>
+            <button 
+              class="btn btn-sm btn-success" 
+              *ngIf="reclamation.statut !== 'traitee'"
+              (click)="markAsTreated(reclamation.id)">
+              ✅ Traiter
+            </button>
+            <select class="statut-select" (change)="updateReclamationStatus(reclamation.id, $event)">
+              <option value="">Changer</option>
+              <option value="nouvelle">Nouvelle</option>
+              <option value="en_cours">En cours</option>
+              <option value="traitee">Traité</option>
+              <option value="rejetee">Rejeté</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message si aucune réclamation -->
+  <div *ngIf="filteredReclamations.length === 0" class="no-reclamations">
+    <div class="no-reclamations-content">
+      <h3>Aucune réclamation trouvée</h3>
+      <p>Aucune réclamation ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir toutes les réclamations</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de détail de réclamation -->
+<div class="modal-overlay" *ngIf="selectedReclamation" (click)="closeModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Détails de la réclamation #{{ selectedReclamation.id }}</h3>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="reclamation-details">
+        <div class="detail-section">
+          <h4>📋 Informations générales</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Sujet :</label>
+              <span>{{ selectedReclamation.sujet }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Type :</label>
+              <span class="type-badge" [ngClass]="'type-' + selectedReclamation.type">
+                {{ getTypeLabel(selectedReclamation.type) }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Priorité :</label>
+              <span class="priorite-badge" [ngClass]="'priorite-' + selectedReclamation.priorite">
+                {{ getPrioriteLabel(selectedReclamation.priorite) }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Statut :</label>
+              <span class="statut-badge" [ngClass]="'statut-' + selectedReclamation.statut">
+                {{ getStatutLabel(selectedReclamation.statut) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>👤 Informations citoyen</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nom :</label>
+              <span>{{ selectedReclamation.citoyen.prenom }} {{ selectedReclamation.citoyen.nom }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Email :</label>
+              <span>{{ selectedReclamation.citoyen.email }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📍 Localisation</h4>
+          <div class="detail-item">
+            <label>Adresse :</label>
+            <span>{{ selectedReclamation.localisation }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📝 Description</h4>
+          <div class="description-content">
+            {{ selectedReclamation.description }}
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedReclamation.commentaires">
+          <h4>💬 Commentaires</h4>
+          <div class="commentaires-content">
+            {{ selectedReclamation.commentaires }}
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📅 Historique</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Date de création :</label>
+              <span>{{ formatDate(selectedReclamation.dateCreation) }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedReclamation.dateTraitement">
+              <label>Date de traitement :</label>
+              <span>{{ formatDate(selectedReclamation.dateTraitement) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">Fermer</button>
+      <button 
+        class="btn btn-primary" 
+        *ngIf="selectedReclamation.statut !== 'traitee'"
+        (click)="markAsTreated(selectedReclamation.id)">
+        Marquer comme traité
+      </button>
+    </div>
+  </div>
+</div>

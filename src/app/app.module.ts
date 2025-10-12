@@ -15,6 +15,9 @@ import { EtablissementsComponent } from './components/citoyen/etablissements/eta
 import { MesReclamationsComponent } from './components/citoyen/mes-reclamations/mes-reclamations.component';
 import { ChatbotComponent } from './components/citoyen/chatbot/chatbot.component';
 import { ProfilComponent } from './components/citoyen/profil/profil.component';
+import { ProjetsAgentComponent } from './components/agent/projets-agent/projets-agent.component';
+import { ReclamationsAgentComponent } from './components/agent/reclamations-agent/reclamations-agent.component';
+import { ProfilAgentComponent } from './components/agent/profil-agent/profil-agent.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,10 @@ import { ProfilComponent } from './components/citoyen/profil/profil.component';
     EtablissementsComponent,
     MesReclamationsComponent,
     ChatbotComponent,
-    ProfilComponent
+    ProfilComponent,
+    ProjetsAgentComponent,
+    ReclamationsAgentComponent,
+    ProfilAgentComponent
   ],
   imports: [
     BrowserModule,

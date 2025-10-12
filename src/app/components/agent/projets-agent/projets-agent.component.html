@@ -1,0 +1,254 @@
+<!-- Sidebar Agent -->
+<div class="agent-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Agent Municipal</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/agent/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/projets" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-text">Projets</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/reclamations" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Réclamations</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/profil" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="agent-main-content">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Projets</h1>
+      <p>Créez et gérez les projets sociaux de votre arrondissement</p>
+    </div>
+    <button class="btn btn-primary" (click)="showCreateForm = !showCreateForm">
+      ➕ Créer un projet
+    </button>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="statutFilter">Filtrer par statut :</label>
+      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterProjects()" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="brouillon">Brouillon</option>
+        <option value="actif">Actif</option>
+        <option value="termine">Terminé</option>
+        <option value="suspendu">Suspendu</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Formulaire de création de projet -->
+  <div class="create-project-form" *ngIf="showCreateForm">
+    <div class="form-container">
+      <div class="form-header">
+        <h3>Créer un nouveau projet</h3>
+        <button class="close-btn" (click)="showCreateForm = false">×</button>
+      </div>
+      
+      <form (ngSubmit)="onSubmitProject()" #projectForm="ngForm">
+        <div class="form-group">
+          <label for="titre">Titre du projet *</label>
+          <input 
+            type="text" 
+            id="titre" 
+            name="titre" 
+            class="form-control" 
+            [(ngModel)]="newProject.titre" 
+            #titre="ngModel"
+            required
+            [class.error]="titre.invalid && titre.touched">
+          <span class="error-message" *ngIf="titre.invalid && titre.touched">
+            Le titre est obligatoire
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            class="form-control" 
+            [(ngModel)]="newProject.description" 
+            #description="ngModel"
+            required
+            rows="4"
+            [class.error]="description.invalid && description.touched"></textarea>
+          <span class="error-message" *ngIf="description.invalid && description.touched">
+            La description est obligatoire
+          </span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dateDebut">Date de début *</label>
+            <input 
+              type="date" 
+              id="dateDebut" 
+              name="dateDebut" 
+              class="form-control" 
+              [(ngModel)]="newProject.dateDebut" 
+              #dateDebut="ngModel"
+              required
+              [class.error]="dateDebut.invalid && dateDebut.touched">
+            <span class="error-message" *ngIf="dateDebut.invalid && dateDebut.touched">
+              La date de début est obligatoire
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="dateFin">Date de fin *</label>
+            <input 
+              type="date" 
+              id="dateFin" 
+              name="dateFin" 
+              class="form-control" 
+              [(ngModel)]="newProject.dateFin" 
+              #dateFin="ngModel"
+              required
+              [class.error]="dateFin.invalid && dateFin.touched">
+            <span class="error-message" *ngIf="dateFin.invalid && dateFin.touched">
+              La date de fin est obligatoire
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="budget">Budget (€) *</label>
+            <input 
+              type="number" 
+              id="budget" 
+              name="budget" 
+              class="form-control" 
+              [(ngModel)]="newProject.budget" 
+              #budget="ngModel"
+              required
+              min="0"
+              [class.error]="budget.invalid && budget.touched">
+            <span class="error-message" *ngIf="budget.invalid && budget.touched">
+              Le budget est obligatoire
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="responsable">Responsable *</label>
+            <input 
+              type="text" 
+              id="responsable" 
+              name="responsable" 
+              class="form-control" 
+              [(ngModel)]="newProject.responsable" 
+              #responsable="ngModel"
+              required
+              [class.error]="responsable.invalid && responsable.touched">
+            <span class="error-message" *ngIf="responsable.invalid && responsable.touched">
+              Le responsable est obligatoire
+            </span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="projectForm.invalid || isSubmitting">
+            <span *ngIf="isSubmitting">Création...</span>
+            <span *ngIf="!isSubmitting">Créer le projet</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="cancelCreateProject()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Liste des projets -->
+  <div class="projects-table-container">
+    <table class="projects-table">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Description</th>
+          <th>Date création</th>
+          <th>Période</th>
+          <th>Budget</th>
+          <th>Responsable</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let projet of filteredProjects" class="project-row">
+          <td class="project-title">{{ projet.titre }}</td>
+          <td class="project-description">{{ projet.description }}</td>
+          <td class="project-date">{{ formatDate(projet.dateCreation) }}</td>
+          <td class="project-period">
+            {{ formatDate(projet.dateDebut) }} - {{ formatDate(projet.dateFin) }}
+          </td>
+          <td class="project-budget">{{ projet.budget | number }} €</td>
+          <td class="project-responsable">{{ projet.responsable }}</td>
+          <td class="project-statut">
+            <span class="statut-badge" [ngClass]="'statut-' + projet.statut">
+              {{ getStatutLabel(projet.statut) }}
+            </span>
+          </td>
+          <td class="project-actions">
+            <button class="btn btn-sm btn-secondary" (click)="viewProject(projet)">Voir</button>
+            <button class="btn btn-sm btn-primary" (click)="editProject(projet)">Modifier</button>
+            <select class="statut-select" (change)="updateProjectStatus(projet.id, $event)">
+              <option value="">Changer statut</option>
+              <option value="brouillon">Brouillon</option>
+              <option value="actif">Actif</option>
+              <option value="termine">Terminé</option>
+              <option value="suspendu">Suspendu</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message si aucun projet -->
+  <div *ngIf="filteredProjects.length === 0" class="no-projects">
+    <div class="no-projects-content">
+      <h3>Aucun projet trouvé</h3>
+      <p>Aucun projet ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir tous les projets</button>
+    </div>
+  </div>
+</div>

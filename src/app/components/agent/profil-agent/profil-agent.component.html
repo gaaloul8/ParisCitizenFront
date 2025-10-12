@@ -1,0 +1,255 @@
+<!-- Sidebar Agent -->
+<div class="agent-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Agent Municipal</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/agent/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/projets" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-text">Projets</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/reclamations" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Réclamations</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/profil" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="agent-main-content">
+  <div class="profile-container">
+    <!-- Informations personnelles -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>👤 Informations personnelles</h2>
+        <button class="btn btn-secondary" (click)="toggleEditMode()">
+          {{ isEditMode ? 'Annuler' : 'Modifier' }}
+        </button>
+      </div>
+      
+      <div class="profile-info" *ngIf="currentUser">
+        <div class="profile-avatar">
+          <div class="avatar-circle">
+            {{ currentUser.username.charAt(0).toUpperCase() }}
+          </div>
+          <h3>{{ getAgentName() }}</h3>
+          <p class="profile-role">Agent Municipal • {{ getMunicipality() }}</p>
+        </div>
+
+        <div class="profile-details">
+          <div class="detail-item">
+            <span class="detail-label">📧 Email :</span>
+            <span class="detail-value" *ngIf="!isEditMode">{{ getAgentEmail() }}</span>
+            <input 
+              *ngIf="isEditMode" 
+              type="email" 
+              [(ngModel)]="editedAgent.email" 
+              class="form-control edit-input">
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🏛️ Municipalité :</span>
+            <span class="detail-value" *ngIf="!isEditMode">{{ getMunicipality() }}</span>
+            <input 
+              *ngIf="isEditMode" 
+              type="text" 
+              [(ngModel)]="editedAgent.municipalite" 
+              class="form-control edit-input">
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">📞 Téléphone :</span>
+            <span class="detail-value" *ngIf="!isEditMode">{{ getAgentPhone() }}</span>
+            <input 
+              *ngIf="isEditMode" 
+              type="tel" 
+              [(ngModel)]="editedAgent.telephone" 
+              class="form-control edit-input">
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">👤 Nom d'utilisateur :</span>
+            <span class="detail-value">{{ currentUser.username }}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">📅 Membre depuis :</span>
+            <span class="detail-value">{{ getMemberSince() }}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🎯 Spécialité :</span>
+            <span class="detail-value">{{ getSpecialite() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-actions" *ngIf="isEditMode">
+        <button class="btn btn-primary" (click)="saveProfile()" [disabled]="isSaving">
+          <span *ngIf="isSaving">Sauvegarde...</span>
+          <span *ngIf="!isSaving">Sauvegarder</span>
+        </button>
+        <button class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Statistiques de performance -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>📊 Mes performances</h2>
+      </div>
+      
+      <div class="performance-stats">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTotalReclamations() }}</div>
+            <div class="stat-label">Réclamations gérées</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTauxResolution() }}%</div>
+            <div class="stat-label">Taux de résolution</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTotalProjets() }}</div>
+            <div class="stat-label">Projets supervisés</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getNoteSatisfaction() }}/5</div>
+            <div class="stat-label">Note de satisfaction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Réclamations récentes -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>📋 Réclamations récentes</h2>
+        <a routerLink="/agent/reclamations" class="btn btn-secondary">Voir toutes</a>
+      </div>
+      
+      <div class="recent-reclamations">
+        <div class="reclamation-item" *ngFor="let reclamation of getRecentReclamations()">
+          <div class="reclamation-info">
+            <div class="reclamation-sujet">{{ reclamation.sujet }}</div>
+            <div class="reclamation-meta">
+              {{ reclamation.citoyen.prenom }} {{ reclamation.citoyen.nom }} • {{ formatDate(reclamation.dateCreation) }}
+            </div>
+          </div>
+          <div class="reclamation-status">
+            <span class="statut-badge" [ngClass]="'statut-' + reclamation.statut">
+              {{ getStatutLabel(reclamation.statut) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projets en cours -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>🎯 Projets en cours</h2>
+        <a routerLink="/agent/projets" class="btn btn-secondary">Voir tous</a>
+      </div>
+      
+      <div class="recent-projects">
+        <div class="project-item" *ngFor="let projet of getActiveProjects()">
+          <div class="project-info">
+            <div class="project-titre">{{ projet.titre }}</div>
+            <div class="project-meta">
+              Budget: {{ projet.budget | number }}€ • Responsable: {{ projet.responsable }}
+            </div>
+          </div>
+          <div class="project-status">
+            <span class="statut-badge" [ngClass]="'statut-' + projet.statut">
+              {{ getStatutLabel(projet.statut) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Préférences -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>⚙️ Préférences</h2>
+      </div>
+      
+      <div class="preferences">
+        <div class="preference-item">
+          <label class="preference-label">
+            <input type="checkbox" [(ngModel)]="preferences.notificationsEmail" class="preference-checkbox">
+            <span class="checkmark"></span>
+            Recevoir des notifications par email
+          </label>
+          <p class="preference-desc">Être informé des nouvelles réclamations et mises à jour</p>
+        </div>
+        
+        <div class="preference-item">
+          <label class="preference-label">
+            <input type="checkbox" [(ngModel)]="preferences.notificationsUrgentes" class="preference-checkbox">
+            <span class="checkmark"></span>
+            Notifications urgentes
+          </label>
+          <p class="preference-desc">Alertes pour les réclamations prioritaires</p>
+        </div>
+        
+        <div class="preference-item">
+          <label class="preference-label">
+            <input type="checkbox" [(ngModel)]="preferences.rapportsHebdo" class="preference-checkbox">
+            <span class="checkmark"></span>
+            Rapports hebdomadaires
+          </label>
+          <p class="preference-desc">Résumé de l'activité de la semaine</p>
+        </div>
+      </div>
+      
+      <div class="preferences-actions">
+        <button class="btn btn-primary" (click)="savePreferences()" [disabled]="isSavingPreferences">
+          <span *ngIf="isSavingPreferences">Sauvegarde...</span>
+          <span *ngIf="!isSavingPreferences">Sauvegarder les préférences</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

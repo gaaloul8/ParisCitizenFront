@@ -1,4 +1,49 @@
-<div class="container">
+<!-- Sidebar Agent -->
+<div class="agent-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Agent Municipal</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/agent/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/projets" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-text">Projets</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/reclamations" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Réclamations</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/agent/profil" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="agent-main-content">
   <div class="dashboard-container">
     <div class="dashboard-header">
       <div>
@@ -14,48 +59,139 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
-      <div class="card">
-        <div class="card-header">📋 Signalements</div>
-        <p>Consultez et gérez les signalements des citoyens de votre arrondissement.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les signalements</button>
+    <!-- Statistiques principales -->
+    <div class="stats-grid" *ngIf="statistiques">
+      <div class="stat-card">
+        <div class="stat-icon">😊</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.tauxSatisfaction }}%</div>
+          <div class="stat-label">Taux de satisfaction</div>
+          <div class="stat-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="statistiques.tauxSatisfaction"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">🏘️ Projets sociaux</div>
-        <p>Créez et gérez les projets sociaux de votre arrondissement.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Gérer les projets</button>
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.reclamationsRecues }}</div>
+          <div class="stat-label">Réclamations reçues</div>
+          <div class="stat-detail">{{ statistiques.reclamationsTraitees }} traitées</div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">💬 Messages</div>
-        <p>Communiquez directement avec les citoyens de votre arrondissement.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les messages</button>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.projetsActifs }}</div>
+          <div class="stat-label">Projets actifs</div>
+          <div class="stat-detail">{{ statistiques.projetsTermines }} terminés</div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">📊 Statistiques</div>
-        <p>Consultez les statistiques de votre arrondissement.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les stats</button>
-      </div>
-
-      <div class="card">
-        <div class="card-header">📅 Planning</div>
-        <p>Organisez votre planning et les interventions.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Voir le planning</button>
-      </div>
-
-      <div class="card">
-        <div class="card-header">📝 Rapports</div>
-        <p>Générez des rapports sur l'activité de votre arrondissement.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Générer un rapport</button>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ getTauxTraitement() }}%</div>
+          <div class="stat-label">Taux de traitement</div>
+          <div class="stat-detail">Réclamations résolues</div>
+        </div>
       </div>
     </div>
 
-    <div style="margin-top: 3rem; text-align: center;">
-      <p style="color: var(--dark-color); font-style: italic;">
-        🚧 Interface en cours de développement - Les fonctionnalités seront disponibles dans les prochaines versions
-      </p>
+    <!-- Graphiques et analyses -->
+    <div class="analytics-grid">
+      <!-- Sujets les plus discutés -->
+      <div class="analytics-card">
+        <div class="card-header">
+          <h3>🔥 Sujets les plus discutés</h3>
+        </div>
+        <div class="topics-list" *ngIf="statistiques">
+          <div class="topic-item" *ngFor="let sujet of statistiques.sujetsPopulaires">
+            <div class="topic-info">
+              <span class="topic-name">{{ sujet.sujet }}</span>
+              <span class="topic-count">{{ sujet.nombre }} réclamations</span>
+            </div>
+            <div class="topic-bar">
+              <div class="topic-fill" [style.width.%]="sujet.pourcentage"></div>
+            </div>
+            <span class="topic-percentage">{{ sujet.pourcentage }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tendance mensuelle -->
+      <div class="analytics-card">
+        <div class="card-header">
+          <h3>📊 Tendance mensuelle</h3>
+        </div>
+        <div class="chart-container" *ngIf="statistiques">
+          <div class="chart-bars">
+            <div class="chart-bar" *ngFor="let mois of statistiques.tendanceMensuelle">
+              <div class="bar-reclamations" [style.height.%]="getBarHeight(mois.reclamations)"></div>
+              <div class="bar-projets" [style.height.%]="getBarHeight(mois.projets * 3)"></div>
+              <span class="bar-label">{{ mois.mois }}</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-color reclamations"></div>
+              <span>Réclamations</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color projets"></div>
+              <span>Projets</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="quick-actions">
+      <h3>Actions rapides</h3>
+      <div class="actions-grid">
+        <button class="action-btn" routerLink="/agent/reclamations">
+          <span class="action-icon">📋</span>
+          <span class="action-text">Nouvelles réclamations</span>
+          <span class="action-count" *ngIf="getNouvellesReclamations() > 0">{{ getNouvellesReclamations() }}</span>
+        </button>
+        
+        <button class="action-btn" routerLink="/agent/projets">
+          <span class="action-icon">🎯</span>
+          <span class="action-text">Gérer les projets</span>
+        </button>
+        
+        <button class="action-btn" (click)="showCreateProject = !showCreateProject">
+          <span class="action-icon">➕</span>
+          <span class="action-text">Nouveau projet</span>
+        </button>
+        
+        <button class="action-btn" routerLink="/agent/profil">
+          <span class="action-icon">👤</span>
+          <span class="action-text">Mon profil</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal création projet (simulé) -->
+    <div class="modal-overlay" *ngIf="showCreateProject" (click)="showCreateProject = false">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Créer un nouveau projet</h3>
+          <button class="modal-close" (click)="showCreateProject = false">×</button>
+        </div>
+        <div class="modal-body">
+          <p>🚧 Fonctionnalité en cours de développement</p>
+          <p>Cette fonctionnalité sera disponible dans la prochaine version.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="showCreateProject = false">Fermer</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
