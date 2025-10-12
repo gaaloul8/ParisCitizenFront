@@ -15,6 +15,10 @@ import { DashboardAgentComponent as AgentDashboardComponent } from './components
 import { ProjetsAgentComponent } from './components/agent/projets-agent/projets-agent.component';
 import { ReclamationsAgentComponent } from './components/agent/reclamations-agent/reclamations-agent.component';
 import { ProfilAgentComponent } from './components/agent/profil-agent/profil-agent.component';
+import { MunicipalitesAdminComponent } from './components/admin/municipalites-admin/municipalites-admin.component';
+import { AgentsAdminComponent } from './components/admin/agents-admin/agents-admin.component';
+import { CitoyensAdminComponent } from './components/admin/citoyens-admin/citoyens-admin.component';
+import { ParametresAdminComponent } from './components/admin/parametres-admin/parametres-admin.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -22,6 +26,10 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'admin/dashboard', component: DashboardAdminComponent },
+  { path: 'admin/municipalites', component: MunicipalitesAdminComponent },
+  { path: 'admin/agents', component: AgentsAdminComponent },
+  { path: 'admin/citoyens', component: CitoyensAdminComponent },
+  { path: 'admin/parametres', component: ParametresAdminComponent },
   { path: 'agent/dashboard', component: DashboardAgentComponent },
   { path: 'agent/projets', component: ProjetsAgentComponent },
   { path: 'agent/reclamations', component: ReclamationsAgentComponent },

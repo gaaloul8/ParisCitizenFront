@@ -1,9 +1,60 @@
-<div class="container">
+<!-- Sidebar Admin -->
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Administrateur</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/municipalites" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-text">Municipalités</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/agents" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Agents</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/citoyens" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Citoyens</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/parametres" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="admin-main-content">
   <div class="dashboard-container">
     <div class="dashboard-header">
       <div>
         <h1 class="dashboard-title">Dashboard Administrateur</h1>
-        <p style="color: var(--dark-color); margin: 0;">Gestion globale de la plateforme ParisCitizen</p>
+        <p style="color: var(--dark-color); margin: 0;">Supervision globale de la plateforme ParisCitizen</p>
       </div>
       <div class="user-info" *ngIf="currentUser">
         <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
@@ -14,48 +65,143 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
-      <div class="card">
-        <div class="card-header">👥 Gestion des utilisateurs</div>
-        <p>Gérez les comptes citoyens, agents municipaux et administrateurs.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Accéder</button>
+    <!-- Statistiques principales -->
+    <div class="stats-grid" *ngIf="statistiques">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.totalCitoyens | number }}</div>
+          <div class="stat-label">Total Citoyens</div>
+          <div class="stat-detail">Moyenne d'âge: {{ statistiques.moyenneAge }} ans</div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">📊 Statistiques</div>
-        <p>Consultez les statistiques globales de la plateforme et des signalements.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les stats</button>
+      <div class="stat-card">
+        <div class="stat-icon">🏛️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.totalMunicipalites }}</div>
+          <div class="stat-label">Municipalités</div>
+          <div class="stat-detail">{{ statistiques.totalAgents }} agents actifs</div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">⚙️ Configuration</div>
-        <p>Configurez les paramètres de la plateforme et les arrondissements.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Configurer</button>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.totalProjets }}</div>
+          <div class="stat-label">Projets Actifs</div>
+          <div class="stat-detail">{{ statistiques.totalReclamations }} réclamations</div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">🔒 Sécurité</div>
-        <p>Surveillez les activités suspectes et gérez les permissions.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Sécurité</button>
-      </div>
-
-      <div class="card">
-        <div class="card-header">📈 Rapports</div>
-        <p>Générez des rapports détaillés sur l'activité de la plateforme.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Générer</button>
-      </div>
-
-      <div class="card">
-        <div class="card-header">🎯 Projets</div>
-        <p>Supervisez les projets sociaux et les initiatives citoyennes.</p>
-        <button class="btn btn-primary" style="margin-top: 1rem;">Superviser</button>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ statistiques.tauxSatisfactionGlobal }}%</div>
+          <div class="stat-label">Satisfaction Globale</div>
+          <div class="stat-detail">Moyenne toutes municipalités</div>
+        </div>
       </div>
     </div>
 
-    <div style="margin-top: 3rem; text-align: center;">
-      <p style="color: var(--dark-color); font-style: italic;">
-        🚧 Interface en cours de développement - Les fonctionnalités seront disponibles dans les prochaines versions
-      </p>
+    <!-- Graphiques et analyses -->
+    <div class="analytics-grid">
+      <!-- Top municipalités -->
+      <div class="analytics-card">
+        <div class="card-header">
+          <h3>🏆 Top Municipalités</h3>
+        </div>
+        <div class="top-municipalites" *ngIf="statistiques">
+          <div class="municipalite-item" *ngFor="let mun of statistiques.topMunicipalites">
+            <div class="municipalite-info">
+              <span class="municipalite-nom">{{ mun.nom }}</span>
+              <span class="municipalite-reclamations">{{ mun.nombreReclamations }} réclamations</span>
+            </div>
+            <div class="municipalite-bar">
+              <div class="municipalite-fill" [style.width.%]="mun.tauxSatisfaction"></div>
+            </div>
+            <span class="municipalite-satisfaction">{{ mun.tauxSatisfaction }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activité mensuelle -->
+      <div class="analytics-card">
+        <div class="card-header">
+          <h3>📈 Activité Mensuelle</h3>
+        </div>
+        <div class="chart-container" *ngIf="statistiques">
+          <div class="chart-bars">
+            <div class="chart-bar" *ngFor="let mois of statistiques.activiteMensuelle">
+              <div class="bar-citoyens" [style.height.%]="getBarHeight(mois.nouveauxCitoyens)"></div>
+              <div class="bar-reclamations" [style.height.%]="getBarHeight(mois.nouvellesReclamations / 2)"></div>
+              <div class="bar-projets" [style.height.%]="getBarHeight(mois.projetsLances * 10)"></div>
+              <span class="bar-label">{{ mois.mois }}</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-color citoyens"></div>
+              <span>Nouveaux Citoyens</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color reclamations"></div>
+              <span>Nouvelles Réclamations</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color projets"></div>
+              <span>Projets Lancés</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Répartition par âge -->
+    <div class="age-distribution">
+      <div class="analytics-card">
+        <div class="card-header">
+          <h3>👥 Répartition par Âge</h3>
+        </div>
+        <div class="age-bars" *ngIf="statistiques">
+          <div class="age-item" *ngFor="let age of statistiques.repartitionParAge">
+            <div class="age-tranche">{{ age.tranche }}</div>
+            <div class="age-bar">
+              <div class="age-fill" [style.width.%]="age.pourcentage"></div>
+            </div>
+            <div class="age-stats">
+              <span class="age-number">{{ age.nombre }}</span>
+              <span class="age-percentage">({{ age.pourcentage }}%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="quick-actions">
+      <h3>Actions Rapides</h3>
+      <div class="actions-grid">
+        <button class="action-btn" routerLink="/admin/municipalites">
+          <span class="action-icon">🏛️</span>
+          <span class="action-text">Gérer Municipalités</span>
+        </button>
+        
+        <button class="action-btn" routerLink="/admin/agents">
+          <span class="action-icon">👥</span>
+          <span class="action-text">Gérer Agents</span>
+        </button>
+        
+        <button class="action-btn" routerLink="/admin/citoyens">
+          <span class="action-icon">👤</span>
+          <span class="action-text">Gérer Citoyens</span>
+        </button>
+        
+        <button class="action-btn" routerLink="/admin/parametres">
+          <span class="action-icon">⚙️</span>
+          <span class="action-text">Paramètres Système</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

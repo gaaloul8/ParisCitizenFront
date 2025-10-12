@@ -1,0 +1,227 @@
+<!-- Sidebar Admin -->
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Administrateur</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/municipalites" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-text">Municipalités</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/agents" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Agents</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/citoyens" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Citoyens</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/parametres" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="admin-main-content">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Municipalités</h1>
+      <p>Supervision et gestion de toutes les municipalités de la plateforme</p>
+    </div>
+    <button class="btn btn-primary" (click)="showAddForm = !showAddForm">
+      ➕ Ajouter une municipalité
+    </button>
+  </div>
+
+  <!-- Formulaire d'ajout -->
+  <div class="add-municipalite-form" *ngIf="showAddForm">
+    <div class="form-container">
+      <div class="form-header">
+        <h3>Ajouter une nouvelle municipalité</h3>
+        <button class="close-btn" (click)="showAddForm = false">×</button>
+      </div>
+      
+      <form (ngSubmit)="onSubmitMunicipalite()" #municipaliteForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nom">Nom de la municipalité *</label>
+            <input 
+              type="text" 
+              id="nom" 
+              name="nom" 
+              class="form-control" 
+              [(ngModel)]="newMunicipalite.nom" 
+              #nom="ngModel"
+              required
+              [class.error]="nom.invalid && nom.touched">
+            <span class="error-message" *ngIf="nom.invalid && nom.touched">
+              Le nom est obligatoire
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="region">Région *</label>
+            <input 
+              type="text" 
+              id="region" 
+              name="region" 
+              class="form-control" 
+              [(ngModel)]="newMunicipalite.region" 
+              #region="ngModel"
+              required
+              [class.error]="region.invalid && region.touched">
+            <span class="error-message" *ngIf="region.invalid && region.touched">
+              La région est obligatoire
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="codePostal">Code postal *</label>
+            <input 
+              type="text" 
+              id="codePostal" 
+              name="codePostal" 
+              class="form-control" 
+              [(ngModel)]="newMunicipalite.codePostal" 
+              #codePostal="ngModel"
+              required
+              pattern="[0-9]{5}"
+              [class.error]="codePostal.invalid && codePostal.touched">
+            <span class="error-message" *ngIf="codePostal.invalid && codePostal.touched">
+              Code postal invalide (5 chiffres)
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="budgetAnnuel">Budget annuel (€) *</label>
+            <input 
+              type="number" 
+              id="budgetAnnuel" 
+              name="budgetAnnuel" 
+              class="form-control" 
+              [(ngModel)]="newMunicipalite.budgetAnnuel" 
+              #budgetAnnuel="ngModel"
+              required
+              min="0"
+              [class.error]="budgetAnnuel.invalid && budgetAnnuel.touched">
+            <span class="error-message" *ngIf="budgetAnnuel.invalid && budgetAnnuel.touched">
+              Le budget est obligatoire
+            </span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="municipaliteForm.invalid || isSubmitting">
+            <span *ngIf="isSubmitting">Ajout...</span>
+            <span *ngIf="!isSubmitting">Ajouter la municipalité</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="cancelAddMunicipalite()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Liste des municipalités -->
+  <div class="municipalites-table-container">
+    <table class="municipalites-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Région</th>
+          <th>Code Postal</th>
+          <th>Agents</th>
+          <th>Citoyens</th>
+          <th>Projets</th>
+          <th>Satisfaction</th>
+          <th>Budget</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let municipalite of municipalites" class="municipalite-row">
+          <td class="municipalite-nom">{{ municipalite.nom }}</td>
+          <td class="municipalite-region">{{ municipalite.region }}</td>
+          <td class="municipalite-code">{{ municipalite.codePostal }}</td>
+          <td class="municipalite-agents">{{ municipalite.nombreAgents }}</td>
+          <td class="municipalite-citoyens">{{ municipalite.nombreCitoyens | number }}</td>
+          <td class="municipalite-projets">{{ municipalite.nombreProjets }}</td>
+          <td class="municipalite-satisfaction">
+            <div class="satisfaction-display">
+              <span class="satisfaction-value">{{ municipalite.tauxSatisfaction }}%</span>
+              <div class="satisfaction-bar">
+                <div class="satisfaction-fill" [style.width.%]="municipalite.tauxSatisfaction"></div>
+              </div>
+            </div>
+          </td>
+          <td class="municipalite-budget">{{ formatCurrency(municipalite.budgetAnnuel) }}</td>
+          <td class="municipalite-statut">
+            <span class="statut-badge" [ngClass]="'statut-' + municipalite.statut">
+              {{ getStatutLabel(municipalite.statut) }}
+            </span>
+          </td>
+          <td class="municipalite-actions">
+            <button class="btn btn-sm btn-info" (click)="viewMunicipalite(municipalite)">
+              👁️ Voir
+            </button>
+            <button class="btn btn-sm btn-secondary" (click)="editMunicipalite(municipalite)">
+              ✏️ Modifier
+            </button>
+            <select class="statut-select" (change)="updateMunicipaliteStatus(municipalite.id, $event)">
+              <option value="">Changer statut</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message si aucune municipalité -->
+  <div *ngIf="municipalites.length === 0" class="no-municipalites">
+    <div class="no-municipalites-content">
+      <h3>Aucune municipalité trouvée</h3>
+      <p>Commencez par ajouter votre première municipalité.</p>
+      <button class="btn btn-primary" (click)="showAddForm = true">Ajouter une municipalité</button>
+    </div>
+  </div>
+</div>

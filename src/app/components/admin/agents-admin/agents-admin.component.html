@@ -1,0 +1,165 @@
+<!-- Sidebar Admin -->
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Administrateur</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/municipalites" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-text">Municipalités</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/agents" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Agents</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/citoyens" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Citoyens</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/parametres" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="admin-main-content">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Agents Municipaux</h1>
+      <p>Supervision et gestion de tous les agents municipaux de la plateforme</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ getTotalAgents() }}</span>
+        <span class="stat-label">Total Agents</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getAgentsActifs() }}</span>
+        <span class="stat-label">Actifs</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getAgentsInactifs() }}</span>
+        <span class="stat-label">Inactifs</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="municipaliteFilter">Filtrer par municipalité :</label>
+      <select id="municipaliteFilter" [(ngModel)]="municipaliteFilter" (change)="filterAgents()" class="form-select">
+        <option value="">Toutes les municipalités</option>
+        <option value="1er arrondissement">1er arrondissement</option>
+        <option value="15ème arrondissement">15ème arrondissement</option>
+        <option value="20ème arrondissement">20ème arrondissement</option>
+        <option value="11ème arrondissement">11ème arrondissement</option>
+        <option value="18ème arrondissement">18ème arrondissement</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="statutFilter">Filtrer par statut :</label>
+      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterAgents()" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="actif">Actif</option>
+        <option value="inactif">Inactif</option>
+        <option value="suspendu">Suspendu</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des agents -->
+  <div class="agents-table-container">
+    <table class="agents-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Municipalité</th>
+          <th>Poste</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Date embauche</th>
+          <th>Réclamations traitées</th>
+          <th>Note satisfaction</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let agent of filteredAgents" class="agent-row">
+          <td class="agent-nom">{{ agent.prenom }} {{ agent.nom }}</td>
+          <td class="agent-municipalite">{{ agent.municipalite }}</td>
+          <td class="agent-poste">{{ agent.poste }}</td>
+          <td class="agent-email">{{ agent.email }}</td>
+          <td class="agent-telephone">{{ agent.telephone }}</td>
+          <td class="agent-date">{{ formatDate(agent.dateEmbauche) }}</td>
+          <td class="agent-reclamations">{{ agent.nombreReclamationsTraitees }}</td>
+          <td class="agent-note">
+            <div class="note-display">
+              <span class="note-value">{{ agent.noteSatisfaction }}/5</span>
+              <div class="note-stars">
+                <span *ngFor="let star of getStars(agent.noteSatisfaction)" class="star">{{ star }}</span>
+              </div>
+            </div>
+          </td>
+          <td class="agent-statut">
+            <span class="statut-badge" [ngClass]="'statut-' + agent.statut">
+              {{ getStatutLabel(agent.statut) }}
+            </span>
+          </td>
+          <td class="agent-actions">
+            <button class="btn btn-sm btn-info" (click)="viewAgent(agent)">
+              👁️ Voir
+            </button>
+            <button class="btn btn-sm btn-secondary" (click)="editAgent(agent)">
+              ✏️ Modifier
+            </button>
+            <select class="statut-select" (change)="updateAgentStatus(agent.id, $event)">
+              <option value="">Changer statut</option>
+              <option value="actif">Actif</option>
+              <option value="inactif">Inactif</option>
+              <option value="suspendu">Suspendu</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message si aucun agent -->
+  <div *ngIf="filteredAgents.length === 0" class="no-agents">
+    <div class="no-agents-content">
+      <h3>Aucun agent trouvé</h3>
+      <p>Aucun agent ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir tous les agents</button>
+    </div>
+  </div>
+</div>

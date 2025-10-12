@@ -1,0 +1,164 @@
+<!-- Sidebar Admin -->
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Administrateur</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/municipalites" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-text">Municipalités</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/agents" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Agents</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/citoyens" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Citoyens</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/parametres" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="admin-main-content">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Citoyens</h1>
+      <p>Supervision et gestion de tous les citoyens de la plateforme</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ getTotalCitoyens() }}</span>
+        <span class="stat-label">Total Citoyens</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getCitoyensActifs() }}</span>
+        <span class="stat-label">Actifs</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getMoyenneAge() }}</span>
+        <span class="stat-label">Âge moyen</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="communeFilter">Filtrer par commune :</label>
+      <select id="communeFilter" [(ngModel)]="communeFilter" (change)="filterCitoyens()" class="form-select">
+        <option value="">Toutes les communes</option>
+        <option value="1er arrondissement">1er arrondissement</option>
+        <option value="15ème arrondissement">15ème arrondissement</option>
+        <option value="20ème arrondissement">20ème arrondissement</option>
+        <option value="11ème arrondissement">11ème arrondissement</option>
+        <option value="18ème arrondissement">18ème arrondissement</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="statutFilter">Filtrer par statut :</label>
+      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterCitoyens()" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="actif">Actif</option>
+        <option value="inactif">Inactif</option>
+        <option value="suspendu">Suspendu</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des citoyens -->
+  <div class="citoyens-table-container">
+    <table class="citoyens-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Âge</th>
+          <th>Commune</th>
+          <th>Email</th>
+          <th>Date inscription</th>
+          <th>Réclamations</th>
+          <th>Projets participés</th>
+          <th>Dernière activité</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let citoyen of filteredCitoyens" class="citoyen-row">
+          <td class="citoyen-nom">{{ citoyen.prenom }} {{ citoyen.nom }}</td>
+          <td class="citoyen-age">{{ citoyen.age }} ans</td>
+          <td class="citoyen-commune">{{ citoyen.commune }}</td>
+          <td class="citoyen-email">{{ citoyen.email }}</td>
+          <td class="citoyen-date">{{ formatDate(citoyen.dateInscription) }}</td>
+          <td class="citoyen-reclamations">
+            <span class="badge" [ngClass]="'badge-' + getBadgeClass(citoyen.nombreReclamations)">
+              {{ citoyen.nombreReclamations }}
+            </span>
+          </td>
+          <td class="citoyen-projets">
+            <span class="badge badge-projets">{{ citoyen.nombreProjetsParticipes }}</span>
+          </td>
+          <td class="citoyen-activite">{{ formatDate(citoyen.derniereActivite) }}</td>
+          <td class="citoyen-statut">
+            <span class="statut-badge" [ngClass]="'statut-' + citoyen.statut">
+              {{ getStatutLabel(citoyen.statut) }}
+            </span>
+          </td>
+          <td class="citoyen-actions">
+            <button class="btn btn-sm btn-info" (click)="viewCitoyen(citoyen)">
+              👁️ Voir
+            </button>
+            <button class="btn btn-sm btn-secondary" (click)="editCitoyen(citoyen)">
+              ✏️ Modifier
+            </button>
+            <select class="statut-select" (change)="updateCitoyenStatus(citoyen.id, $event)">
+              <option value="">Changer statut</option>
+              <option value="actif">Actif</option>
+              <option value="inactif">Inactif</option>
+              <option value="suspendu">Suspendu</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message si aucun citoyen -->
+  <div *ngIf="filteredCitoyens.length === 0" class="no-citoyens">
+    <div class="no-citoyens-content">
+      <h3>Aucun citoyen trouvé</h3>
+      <p>Aucun citoyen ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir tous les citoyens</button>
+    </div>
+  </div>
+</div>

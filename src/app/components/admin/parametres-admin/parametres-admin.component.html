@@ -1,0 +1,245 @@
+<!-- Sidebar Admin -->
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-logo">ParisCitizen</h2>
+    <p class="sidebar-subtitle">Administrateur</p>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/municipalites" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-text">Municipalités</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/agents" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Agents</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/citoyens" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Citoyens</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/parametres" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-text">Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="admin-main-content">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Paramètres Système</h1>
+      <p>Configuration et gestion des paramètres de la plateforme ParisCitizen</p>
+    </div>
+  </div>
+
+  <!-- Sections des paramètres -->
+  <div class="parametres-sections">
+    
+    <!-- Configuration générale -->
+    <div class="parametres-section">
+      <div class="section-header">
+        <h3>⚙️ Configuration Générale</h3>
+      </div>
+      <div class="parametres-content">
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.maintenanceMode" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Mode maintenance
+          </label>
+          <p class="parametre-desc">Activer le mode maintenance pour toutes les municipalités</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.newUserRegistration" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Inscription nouveaux utilisateurs
+          </label>
+          <p class="parametre-desc">Autoriser l'inscription de nouveaux citoyens</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.emailNotifications" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Notifications email
+          </label>
+          <p class="parametre-desc">Activer les notifications par email pour les utilisateurs</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration sécurité -->
+    <div class="parametres-section">
+      <div class="section-header">
+        <h3>🔒 Sécurité</h3>
+      </div>
+      <div class="parametres-content">
+        <div class="parametre-item">
+          <label class="parametre-label">
+            Durée de session (minutes)
+          </label>
+          <input type="number" [(ngModel)]="parametres.sessionTimeout" class="form-control" min="5" max="1440">
+          <p class="parametre-desc">Durée avant expiration automatique de la session</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.twoFactorAuth" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Authentification à deux facteurs
+          </label>
+          <p class="parametre-desc">Forcer l'authentification à deux facteurs pour les administrateurs</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.passwordComplexity" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Complexité des mots de passe
+          </label>
+          <p class="parametre-desc">Exiger des mots de passe complexes (majuscules, chiffres, caractères spéciaux)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration notifications -->
+    <div class="parametres-section">
+      <div class="section-header">
+        <h3>📧 Notifications</h3>
+      </div>
+      <div class="parametres-content">
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.adminNotifications" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Notifications administrateur
+          </label>
+          <p class="parametre-desc">Recevoir des notifications pour les activités importantes</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.weeklyReports" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Rapports hebdomadaires
+          </label>
+          <p class="parametre-desc">Générer automatiquement des rapports hebdomadaires</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.errorAlerts" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Alertes d'erreur
+          </label>
+          <p class="parametre-desc">Être alerté en cas d'erreurs système</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration backup -->
+    <div class="parametres-section">
+      <div class="section-header">
+        <h3>💾 Sauvegarde</h3>
+      </div>
+      <div class="parametres-content">
+        <div class="parametre-item">
+          <label class="parametre-label">
+            <input type="checkbox" [(ngModel)]="parametres.autoBackup" class="parametre-checkbox">
+            <span class="checkmark"></span>
+            Sauvegarde automatique
+          </label>
+          <p class="parametre-desc">Effectuer des sauvegardes automatiques quotidiennes</p>
+        </div>
+        
+        <div class="parametre-item">
+          <label class="parametre-label">
+            Fréquence de sauvegarde
+          </label>
+          <select [(ngModel)]="parametres.backupFrequency" class="form-select">
+            <option value="daily">Quotidienne</option>
+            <option value="weekly">Hebdomadaire</option>
+            <option value="monthly">Mensuelle</option>
+          </select>
+          <p class="parametre-desc">Fréquence des sauvegardes automatiques</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="parametres-actions">
+      <button class="btn btn-primary" (click)="saveParametres()" [disabled]="isSaving">
+        <span *ngIf="isSaving">Sauvegarde...</span>
+        <span *ngIf="!isSaving">💾 Sauvegarder les paramètres</span>
+      </button>
+      
+      <button class="btn btn-secondary" (click)="resetParametres()">
+        🔄 Réinitialiser
+      </button>
+      
+      <button class="btn btn-warning" (click)="exportParametres()">
+        📤 Exporter la configuration
+      </button>
+    </div>
+
+    <!-- Informations système -->
+    <div class="system-info">
+      <div class="section-header">
+        <h3>ℹ️ Informations Système</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Version de l'application</label>
+          <span>1.0.0</span>
+        </div>
+        <div class="info-item">
+          <label>Dernière mise à jour</label>
+          <span>{{ getLastUpdate() }}</span>
+        </div>
+        <div class="info-item">
+          <label>Serveur de base de données</label>
+          <span>PostgreSQL 14.5</span>
+        </div>
+        <div class="info-item">
+          <label>Environnement</label>
+          <span>Production</span>
+        </div>
+        <div class="info-item">
+          <label>Espace disque utilisé</label>
+          <span>2.3 GB / 50 GB</span>
+        </div>
+        <div class="info-item">
+          <label>Utilisateurs connectés</label>
+          <span>1,247</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

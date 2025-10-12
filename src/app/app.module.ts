@@ -18,6 +18,10 @@ import { ProfilComponent } from './components/citoyen/profil/profil.component';
 import { ProjetsAgentComponent } from './components/agent/projets-agent/projets-agent.component';
 import { ReclamationsAgentComponent } from './components/agent/reclamations-agent/reclamations-agent.component';
 import { ProfilAgentComponent } from './components/agent/profil-agent/profil-agent.component';
+import { MunicipalitesAdminComponent } from './components/admin/municipalites-admin/municipalites-admin.component';
+import { AgentsAdminComponent } from './components/admin/agents-admin/agents-admin.component';
+import { CitoyensAdminComponent } from './components/admin/citoyens-admin/citoyens-admin.component';
+import { ParametresAdminComponent } from './components/admin/parametres-admin/parametres-admin.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +39,11 @@ import { ProfilAgentComponent } from './components/agent/profil-agent/profil-age
     ProfilComponent,
     ProjetsAgentComponent,
     ReclamationsAgentComponent,
-    ProfilAgentComponent
+    ProfilAgentComponent,
+    MunicipalitesAdminComponent,
+    AgentsAdminComponent,
+    CitoyensAdminComponent,
+    ParametresAdminComponent
   ],
   imports: [
     BrowserModule,
