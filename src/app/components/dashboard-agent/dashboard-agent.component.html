@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">Dashboard Agent Municipal</h1>
+        <p style="color: var(--dark-color); margin: 0;">Gestion des signalements et projets de votre arrondissement</p>
+      </div>
+      <div class="user-info" *ngIf="currentUser">
+        <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
+        <div>
+          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.username }}</div>
+          <div style="font-size: 0.9rem; color: var(--dark-color);">Agent municipal</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+      <div class="card">
+        <div class="card-header">📋 Signalements</div>
+        <p>Consultez et gérez les signalements des citoyens de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les signalements</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🏘️ Projets sociaux</div>
+        <p>Créez et gérez les projets sociaux de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Gérer les projets</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">💬 Messages</div>
+        <p>Communiquez directement avec les citoyens de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les messages</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">📊 Statistiques</div>
+        <p>Consultez les statistiques de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les stats</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">📅 Planning</div>
+        <p>Organisez votre planning et les interventions.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir le planning</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">📝 Rapports</div>
+        <p>Générez des rapports sur l'activité de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Générer un rapport</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+      <p style="color: var(--dark-color); font-style: italic;">
+        🚧 Interface en cours de développement - Les fonctionnalités seront disponibles dans les prochaines versions
+      </p>
+    </div>
+  </div>
+</div>

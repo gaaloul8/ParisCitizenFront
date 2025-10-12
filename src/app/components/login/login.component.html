@@ -1,0 +1,96 @@
+<div class="container">
+  <div class="form-container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 style="color: var(--primary-color); margin-bottom: 0.5rem;">Connexion</h1>
+      <p style="color: var(--dark-color);">Accédez à votre espace personnel</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="role">Rôle *</label>
+        <select 
+          id="role" 
+          name="role" 
+          class="form-select" 
+          [(ngModel)]="loginData.role" 
+          #role="ngModel"
+          required
+          [class.error]="role.invalid && role.touched">
+          <option value="">Sélectionnez votre rôle</option>
+          <option value="citoyen">Citoyen</option>
+          <option value="agent">Agent municipal</option>
+          <option value="admin">Administrateur</option>
+        </select>
+        <span class="error-message" *ngIf="role.invalid && role.touched">
+          Veuillez sélectionner votre rôle
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur *</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          class="form-control" 
+          [(ngModel)]="loginData.username" 
+          #username="ngModel"
+          required
+          placeholder="admin, agent ou citoyen"
+          [class.error]="username.invalid && username.touched">
+        <span class="error-message" *ngIf="username.invalid && username.touched">
+          Veuillez saisir votre nom d'utilisateur
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe *</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          [(ngModel)]="loginData.password" 
+          #password="ngModel"
+          required
+          placeholder="admin, agent ou citoyen"
+          [class.error]="password.invalid && password.touched">
+        <span class="error-message" *ngIf="password.invalid && password.touched">
+          Veuillez saisir votre mot de passe
+        </span>
+      </div>
+
+      <div class="form-group" style="text-align: center;">
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="loginForm.invalid || isLoading"
+          style="width: 100%; padding: 1rem;">
+          <span *ngIf="isLoading">Connexion en cours...</span>
+          <span *ngIf="!isLoading">Se connecter</span>
+        </button>
+      </div>
+
+      <div class="form-group" style="text-align: center;">
+        <p style="margin: 0;">
+          Pas encore de compte ? 
+          <a routerLink="/register" style="color: var(--secondary-color); text-decoration: none;">S'inscrire</a>
+        </p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message" style="text-align: center; margin-top: 1rem;">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Informations de connexion pour la démo -->
+      <div style="background: var(--light-color); padding: 1rem; border-radius: var(--border-radius); margin-top: 2rem;">
+        <h4 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">🔐 Comptes de démonstration</h4>
+        <div style="display: grid; gap: 0.5rem; font-size: 0.9rem;">
+          <div><strong>Administrateur:</strong> admin / admin</div>
+          <div><strong>Agent municipal:</strong> agent / agent</div>
+          <div><strong>Citoyen:</strong> citoyen / citoyen</div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

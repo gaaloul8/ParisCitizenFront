@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">Dashboard Administrateur</h1>
+        <p style="color: var(--dark-color); margin: 0;">Gestion globale de la plateforme ParisCitizen</p>
+      </div>
+      <div class="user-info" *ngIf="currentUser">
+        <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
+        <div>
+          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.username }}</div>
+          <div style="font-size: 0.9rem; color: var(--dark-color);">Administrateur</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+      <div class="card">
+        <div class="card-header">👥 Gestion des utilisateurs</div>
+        <p>Gérez les comptes citoyens, agents municipaux et administrateurs.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Accéder</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">📊 Statistiques</div>
+        <p>Consultez les statistiques globales de la plateforme et des signalements.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les stats</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">⚙️ Configuration</div>
+        <p>Configurez les paramètres de la plateforme et les arrondissements.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Configurer</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🔒 Sécurité</div>
+        <p>Surveillez les activités suspectes et gérez les permissions.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Sécurité</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">📈 Rapports</div>
+        <p>Générez des rapports détaillés sur l'activité de la plateforme.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Générer</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🎯 Projets</div>
+        <p>Supervisez les projets sociaux et les initiatives citoyennes.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Superviser</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+      <p style="color: var(--dark-color); font-style: italic;">
+        🚧 Interface en cours de développement - Les fonctionnalités seront disponibles dans les prochaines versions
+      </p>
+    </div>
+  </div>
+</div>

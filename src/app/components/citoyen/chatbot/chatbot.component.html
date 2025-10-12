@@ -1,0 +1,135 @@
+<!-- Navbar Citoyen -->
+<nav class="navbar-citoyen">
+  <div class="navbar-container">
+    <a routerLink="/citoyen/dashboard" class="logo-citoyen">ParisCitizen</a>
+    <ul class="nav-links-citoyen">
+      <li><a routerLink="/citoyen/projets" routerLinkActive="active">Projets</a></li>
+      <li><a routerLink="/citoyen/etablissements" routerLinkActive="active">Établissements</a></li>
+      <li><a routerLink="/citoyen/mes-reclamations" routerLinkActive="active">Mes Réclamations</a></li>
+      <li><a routerLink="/citoyen/chatbot" routerLinkActive="active">Chatbot</a></li>
+      <li><a routerLink="/citoyen/profil" routerLinkActive="active">Profil</a></li>
+      <li><a href="#" (click)="logout()">Déconnexion</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Assistant virtuel ParisCitizen</h1>
+    <p>Posez vos questions à nos agents spécialisés</p>
+  </div>
+
+  <div class="chatbot-container">
+    <!-- Sélecteur d'agent -->
+    <div class="agent-selector">
+      <h3>Choisissez votre agent spécialisé :</h3>
+      <div class="agent-buttons">
+        <button 
+          class="agent-btn" 
+          [class.active]="selectedAgent === 'etablissement'"
+          (click)="selectAgent('etablissement')">
+          <span class="agent-icon">🏢</span>
+          <span class="agent-name">Agent Établissement</span>
+          <span class="agent-desc">Informations sur les services publics</span>
+        </button>
+        
+        <button 
+          class="agent-btn" 
+          [class.active]="selectedAgent === 'projet'"
+          (click)="selectAgent('projet')">
+          <span class="agent-icon">🎯</span>
+          <span class="agent-name">Agent Projet Social</span>
+          <span class="agent-desc">Projets et initiatives citoyennes</span>
+        </button>
+        
+        <button 
+          class="agent-btn" 
+          [class.active]="selectedAgent === 'reclamation'"
+          (click)="selectAgent('reclamation')">
+          <span class="agent-icon">📋</span>
+          <span class="agent-name">Agent Réclamation</span>
+          <span class="agent-desc">Aide pour vos signalements</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Zone de chat -->
+    <div class="chat-container" *ngIf="selectedAgent">
+      <div class="chat-header">
+        <h3>{{ getAgentName(selectedAgent) }}</h3>
+        <p>{{ getAgentDescription(selectedAgent) }}</p>
+      </div>
+
+      <div class="chat-messages" #chatMessages>
+        <div *ngIf="getMessages(selectedAgent).length === 0" class="welcome-message">
+          <div class="welcome-content">
+            <span class="welcome-icon">👋</span>
+            <p>Bonjour ! Je suis votre {{ getAgentName(selectedAgent) }}. Comment puis-je vous aider aujourd'hui ?</p>
+            <div class="suggestions">
+              <button class="suggestion-btn" *ngFor="let suggestion of getSuggestions(selectedAgent)" (click)="sendSuggestion(suggestion)">
+                {{ suggestion }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngFor="let message of getMessages(selectedAgent)" class="message" [ngClass]="'message-' + message.expediteur">
+          <div class="message-content">
+            <div class="message-avatar" *ngIf="message.expediteur === 'bot'">
+              <span [innerHTML]="getAgentIcon(selectedAgent)"></span>
+            </div>
+            <div class="message-text">
+              <p>{{ message.contenu }}</p>
+              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+            </div>
+            <div class="message-avatar" *ngIf="message.expediteur === 'user'">
+              <span>👤</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isTyping" class="message message-bot">
+          <div class="message-content">
+            <div class="message-avatar">
+              <span [innerHTML]="getAgentIcon(selectedAgent)"></span>
+            </div>
+            <div class="message-text">
+              <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone de saisie -->
+      <div class="chat-input">
+        <form (ngSubmit)="sendMessage()" #messageForm="ngForm">
+          <div class="input-group">
+            <input 
+              type="text" 
+              [(ngModel)]="currentMessage" 
+              name="message" 
+              placeholder="Tapez votre message..." 
+              class="message-input"
+              required
+              [disabled]="isTyping">
+            <button type="submit" class="send-btn" [disabled]="!currentMessage.trim() || isTyping">
+              <span>➤</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Message si aucun agent sélectionné -->
+    <div *ngIf="!selectedAgent" class="no-agent-selected">
+      <div class="no-agent-content">
+        <h3>👋 Bienvenue !</h3>
+        <p>Sélectionnez un agent spécialisé ci-dessus pour commencer votre conversation.</p>
+      </div>
+    </div>
+  </div>
+</div>

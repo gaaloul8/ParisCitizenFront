@@ -1,0 +1,97 @@
+<!-- Navbar Citoyen -->
+<nav class="navbar-citoyen">
+  <div class="navbar-container">
+    <a routerLink="/citoyen/dashboard" class="logo-citoyen">ParisCitizen</a>
+    <ul class="nav-links-citoyen">
+      <li><a routerLink="/citoyen/projets" routerLinkActive="active">Projets</a></li>
+      <li><a routerLink="/citoyen/etablissements" routerLinkActive="active">Établissements</a></li>
+      <li><a routerLink="/citoyen/mes-reclamations" routerLinkActive="active">Mes Réclamations</a></li>
+      <li><a routerLink="/citoyen/chatbot" routerLinkActive="active">Chatbot</a></li>
+      <li><a routerLink="/citoyen/profil" routerLinkActive="active">Profil</a></li>
+      <li><a href="#" (click)="logout()">Déconnexion</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Établissements de votre quartier</h1>
+    <p>Découvrez les services, écoles, hôpitaux et associations de votre arrondissement</p>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="typeFilter">Filtrer par type :</label>
+      <select id="typeFilter" [(ngModel)]="typeFilter" (change)="filterEtablissements()" class="form-select">
+        <option value="">Tous les types</option>
+        <option value="ecole">Écoles</option>
+        <option value="hopital">Hôpitaux</option>
+        <option value="mairie">Mairies</option>
+        <option value="association">Associations</option>
+        <option value="culturel">Établissements culturels</option>
+        <option value="sportif">Établissements sportifs</option>
+        <option value="social">Établissements sociaux</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des établissements -->
+  <div class="etablissements-grid">
+    <div *ngFor="let etablissement of filteredEtablissements" class="etablissement-card">
+      <div class="etablissement-header">
+        <div class="etablissement-icon">
+          <span [innerHTML]="getTypeIcon(etablissement.type)"></span>
+        </div>
+        <div class="etablissement-info">
+          <h3>{{ etablissement.nom }}</h3>
+          <span class="etablissement-type">{{ getTypeLabel(etablissement.type) }}</span>
+        </div>
+      </div>
+      
+      <div class="etablissement-content">
+        <div class="etablissement-details">
+          <div class="detail-row">
+            <span class="detail-icon">📍</span>
+            <span class="detail-text">{{ etablissement.adresse }}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="detail-icon">📞</span>
+            <span class="detail-text">{{ etablissement.telephone }}</span>
+          </div>
+          
+          <div class="detail-row" *ngIf="etablissement.email">
+            <span class="detail-icon">✉️</span>
+            <span class="detail-text">{{ etablissement.email }}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="detail-icon">🕒</span>
+            <span class="detail-text">{{ etablissement.horaires }}</span>
+          </div>
+        </div>
+        
+        <p class="etablissement-description">{{ etablissement.description }}</p>
+      </div>
+      
+      <div class="etablissement-actions">
+        <button class="btn btn-primary" *ngIf="etablissement.siteWeb">
+          Visiter le site
+        </button>
+        <button class="btn btn-secondary">
+          Contacter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun établissement -->
+  <div *ngIf="filteredEtablissements.length === 0" class="no-etablissements">
+    <div class="no-etablissements-content">
+      <h3>Aucun établissement trouvé</h3>
+      <p>Aucun établissement ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir tous les établissements</button>
+    </div>
+  </div>
+</div>

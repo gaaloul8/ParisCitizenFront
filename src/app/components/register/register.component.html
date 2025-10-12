@@ -1,0 +1,160 @@
+<div class="container">
+  <div class="form-container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 style="color: var(--primary-color); margin-bottom: 0.5rem;">Inscription Citoyen</h1>
+      <p style="color: var(--dark-color);">Rejoignez la communauté ParisCitizen</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="form-group">
+        <label for="nom">Nom *</label>
+        <input 
+          type="text" 
+          id="nom" 
+          name="nom" 
+          class="form-control" 
+          [(ngModel)]="registerData.nom" 
+          #nom="ngModel"
+          required
+          minlength="2"
+          [class.error]="nom.invalid && nom.touched">
+        <span class="error-message" *ngIf="nom.invalid && nom.touched">
+          Le nom doit contenir au moins 2 caractères
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="prenom">Prénom *</label>
+        <input 
+          type="text" 
+          id="prenom" 
+          name="prenom" 
+          class="form-control" 
+          [(ngModel)]="registerData.prenom" 
+          #prenom="ngModel"
+          required
+          minlength="2"
+          [class.error]="prenom.invalid && prenom.touched">
+        <span class="error-message" *ngIf="prenom.invalid && prenom.touched">
+          Le prénom doit contenir au moins 2 caractères
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control" 
+          [(ngModel)]="registerData.email" 
+          #email="ngModel"
+          required
+          email
+          [class.error]="email.invalid && email.touched">
+        <span class="error-message" *ngIf="email.invalid && email.touched">
+          Veuillez saisir un email valide
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="commune">Arrondissement *</label>
+        <select 
+          id="commune" 
+          name="commune" 
+          class="form-select" 
+          [(ngModel)]="registerData.commune" 
+          #commune="ngModel"
+          required
+          [class.error]="commune.invalid && commune.touched">
+          <option value="">Sélectionnez votre arrondissement</option>
+          <option value="1er">1er arrondissement</option>
+          <option value="2e">2e arrondissement</option>
+          <option value="3e">3e arrondissement</option>
+          <option value="4e">4e arrondissement</option>
+          <option value="5e">5e arrondissement</option>
+          <option value="6e">6e arrondissement</option>
+          <option value="7e">7e arrondissement</option>
+          <option value="8e">8e arrondissement</option>
+          <option value="9e">9e arrondissement</option>
+          <option value="10e">10e arrondissement</option>
+          <option value="11e">11e arrondissement</option>
+          <option value="12e">12e arrondissement</option>
+          <option value="13e">13e arrondissement</option>
+          <option value="14e">14e arrondissement</option>
+          <option value="15e">15e arrondissement</option>
+          <option value="16e">16e arrondissement</option>
+          <option value="17e">17e arrondissement</option>
+          <option value="18e">18e arrondissement</option>
+          <option value="19e">19e arrondissement</option>
+          <option value="20e">20e arrondissement</option>
+        </select>
+        <span class="error-message" *ngIf="commune.invalid && commune.touched">
+          Veuillez sélectionner votre arrondissement
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe *</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          [(ngModel)]="registerData.password" 
+          #password="ngModel"
+          required
+          minlength="6"
+          [class.error]="password.invalid && password.touched">
+        <span class="error-message" *ngIf="password.invalid && password.touched">
+          Le mot de passe doit contenir au moins 6 caractères
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmer le mot de passe *</label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          name="confirmPassword" 
+          class="form-control" 
+          [(ngModel)]="registerData.confirmPassword" 
+          #confirmPassword="ngModel"
+          required
+          [class.error]="confirmPassword.invalid && confirmPassword.touched">
+        <span class="error-message" *ngIf="confirmPassword.invalid && confirmPassword.touched">
+          Veuillez confirmer votre mot de passe
+        </span>
+        <span class="error-message" *ngIf="registerData.password !== registerData.confirmPassword && confirmPassword.touched">
+          Les mots de passe ne correspondent pas
+        </span>
+      </div>
+
+      <div class="form-group" style="text-align: center;">
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="registerForm.invalid || registerData.password !== registerData.confirmPassword || isLoading"
+          style="width: 100%; padding: 1rem;">
+          <span *ngIf="isLoading">Inscription en cours...</span>
+          <span *ngIf="!isLoading">Créer mon compte</span>
+        </button>
+      </div>
+
+      <div class="form-group" style="text-align: center;">
+        <p style="margin: 0;">
+          Déjà un compte ? 
+          <a routerLink="/login" style="color: var(--secondary-color); text-decoration: none;">Se connecter</a>
+        </p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message" style="text-align: center; margin-top: 1rem;">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="success-message" style="text-align: center; margin-top: 1rem;">
+        {{ successMessage }}
+      </div>
+    </form>
+  </div>
+</div>

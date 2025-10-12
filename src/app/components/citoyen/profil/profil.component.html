@@ -1,0 +1,212 @@
+<!-- Navbar Citoyen -->
+<nav class="navbar-citoyen">
+  <div class="navbar-container">
+    <a routerLink="/citoyen/dashboard" class="logo-citoyen">ParisCitizen</a>
+    <ul class="nav-links-citoyen">
+      <li><a routerLink="/citoyen/projets" routerLinkActive="active">Projets</a></li>
+      <li><a routerLink="/citoyen/etablissements" routerLinkActive="active">Établissements</a></li>
+      <li><a routerLink="/citoyen/mes-reclamations" routerLinkActive="active">Mes Réclamations</a></li>
+      <li><a routerLink="/citoyen/chatbot" routerLinkActive="active">Chatbot</a></li>
+      <li><a routerLink="/citoyen/profil" routerLinkActive="active">Profil</a></li>
+      <li><a href="#" (click)="logout()">Déconnexion</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Mon profil</h1>
+    <p>Gérez vos informations personnelles et vos préférences</p>
+  </div>
+
+  <div class="profile-container">
+    <!-- Informations personnelles -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>👤 Informations personnelles</h2>
+        <button class="btn btn-secondary" (click)="toggleEditMode()">
+          {{ isEditMode ? 'Annuler' : 'Modifier' }}
+        </button>
+      </div>
+      
+      <div class="profile-info" *ngIf="currentUser">
+        <div class="profile-avatar">
+          <div class="avatar-circle">
+            {{ currentUser.prenom?.charAt(0) || currentUser.username.charAt(0).toUpperCase() }}
+          </div>
+          <h3>{{ currentUser.prenom }} {{ currentUser.nom }}</h3>
+          <p class="profile-role">Citoyen • {{ currentUser.commune }}</p>
+        </div>
+
+        <div class="profile-details">
+          <div class="detail-item">
+            <span class="detail-label">📧 Email :</span>
+            <span class="detail-value" *ngIf="!isEditMode">{{ currentUser.email }}</span>
+            <input 
+              *ngIf="isEditMode" 
+              type="email" 
+              [(ngModel)]="editedUser!.email" 
+              class="form-control edit-input">
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🏘️ Arrondissement :</span>
+            <span class="detail-value" *ngIf="!isEditMode">{{ currentUser.commune }}</span>
+            <select 
+              *ngIf="isEditMode" 
+              [(ngModel)]="editedUser!.commune" 
+              class="form-select edit-input">
+              <option value="1er">1er arrondissement</option>
+              <option value="2e">2e arrondissement</option>
+              <option value="3e">3e arrondissement</option>
+              <option value="4e">4e arrondissement</option>
+              <option value="5e">5e arrondissement</option>
+              <option value="6e">6e arrondissement</option>
+              <option value="7e">7e arrondissement</option>
+              <option value="8e">8e arrondissement</option>
+              <option value="9e">9e arrondissement</option>
+              <option value="10e">10e arrondissement</option>
+              <option value="11e">11e arrondissement</option>
+              <option value="12e">12e arrondissement</option>
+              <option value="13e">13e arrondissement</option>
+              <option value="14e">14e arrondissement</option>
+              <option value="15e">15e arrondissement</option>
+              <option value="16e">16e arrondissement</option>
+              <option value="17e">17e arrondissement</option>
+              <option value="18e">18e arrondissement</option>
+              <option value="19e">19e arrondissement</option>
+              <option value="20e">20e arrondissement</option>
+            </select>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">👤 Nom d'utilisateur :</span>
+            <span class="detail-value">{{ currentUser.username }}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">📅 Membre depuis :</span>
+            <span class="detail-value">{{ getMemberSince() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-actions" *ngIf="isEditMode">
+        <button class="btn btn-primary" (click)="saveProfile()" [disabled]="isSaving">
+          <span *ngIf="isSaving">Sauvegarde...</span>
+          <span *ngIf="!isSaving">Sauvegarder</span>
+        </button>
+        <button class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Statistiques d'activité -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>📊 Mon activité</h2>
+      </div>
+      
+      <div class="activity-stats">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getReclamationsCount() }}</div>
+            <div class="stat-label">Réclamations envoyées</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getTreatedReclamationsCount() }}</div>
+            <div class="stat-label">Réclamations traitées</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getParticipationsCount() }}</div>
+            <div class="stat-label">Projets suivis</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ getChatMessagesCount() }}</div>
+            <div class="stat-label">Messages chatbot</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Préférences -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>⚙️ Préférences</h2>
+      </div>
+      
+      <div class="preferences">
+        <div class="preference-item">
+          <label class="preference-label">
+            <input type="checkbox" [(ngModel)]="preferences.notificationsEmail" class="preference-checkbox">
+            <span class="checkmark"></span>
+            Recevoir des notifications par email
+          </label>
+          <p class="preference-desc">Être informé des mises à jour sur vos réclamations et projets</p>
+        </div>
+        
+        <div class="preference-item">
+          <label class="preference-label">
+            <input type="checkbox" [(ngModel)]="preferences.newsletter" class="preference-checkbox">
+            <span class="checkmark"></span>
+            Recevoir la newsletter municipale
+          </label>
+          <p class="preference-desc">Actualités et événements de votre arrondissement</p>
+        </div>
+        
+        <div class="preference-item">
+          <label class="preference-label">
+            <input type="checkbox" [(ngModel)]="preferences.projectUpdates" class="preference-checkbox">
+            <span class="checkmark"></span>
+            Mises à jour des projets
+          </label>
+          <p class="preference-desc">Nouvelles sur les projets que vous suivez</p>
+        </div>
+      </div>
+      
+      <div class="preferences-actions">
+        <button class="btn btn-primary" (click)="savePreferences()" [disabled]="isSavingPreferences">
+          <span *ngIf="isSavingPreferences">Sauvegarde...</span>
+          <span *ngIf="!isSavingPreferences">Sauvegarder les préférences</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Actions du compte -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>🔒 Sécurité du compte</h2>
+      </div>
+      
+      <div class="security-actions">
+        <div class="security-item">
+          <div class="security-info">
+            <h4>Changer le mot de passe</h4>
+            <p>Mettez à jour votre mot de passe pour sécuriser votre compte</p>
+          </div>
+          <button class="btn btn-secondary">Modifier</button>
+        </div>
+        
+        <div class="security-item">
+          <div class="security-info">
+            <h4>Supprimer le compte</h4>
+            <p>Supprimer définitivement votre compte et toutes vos données</p>
+          </div>
+          <button class="btn btn-danger">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

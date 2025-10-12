@@ -1,0 +1,196 @@
+<!-- Navbar Citoyen -->
+<nav class="navbar-citoyen">
+  <div class="navbar-container">
+    <a routerLink="/citoyen/dashboard" class="logo-citoyen">ParisCitizen</a>
+    <ul class="nav-links-citoyen">
+      <li><a routerLink="/citoyen/projets" routerLinkActive="active">Projets</a></li>
+      <li><a routerLink="/citoyen/etablissements" routerLinkActive="active">Établissements</a></li>
+      <li><a routerLink="/citoyen/mes-reclamations" routerLinkActive="active">Mes Réclamations</a></li>
+      <li><a routerLink="/citoyen/chatbot" routerLinkActive="active">Chatbot</a></li>
+      <li><a routerLink="/citoyen/profil" routerLinkActive="active">Profil</a></li>
+      <li><a href="#" (click)="logout()">Déconnexion</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Mes réclamations</h1>
+    <p>Consultez l'état de vos signalements et créez de nouvelles réclamations</p>
+    <button class="btn btn-primary" (click)="showNewReclamationForm = !showNewReclamationForm">
+      📝 Nouvelle réclamation
+    </button>
+  </div>
+
+  <!-- Formulaire de nouvelle réclamation -->
+  <div *ngIf="showNewReclamationForm" class="new-reclamation-form">
+    <div class="form-container">
+      <h3>Créer une nouvelle réclamation</h3>
+      <form (ngSubmit)="onSubmitReclamation()" #reclamationForm="ngForm">
+        <div class="form-group">
+          <label for="sujet">Sujet *</label>
+          <input 
+            type="text" 
+            id="sujet" 
+            name="sujet" 
+            class="form-control" 
+            [(ngModel)]="newReclamation.sujet" 
+            #sujet="ngModel"
+            required
+            [class.error]="sujet.invalid && sujet.touched">
+          <span class="error-message" *ngIf="sujet.invalid && sujet.touched">
+            Le sujet est obligatoire
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="type">Type de problème *</label>
+          <select 
+            id="type" 
+            name="type" 
+            class="form-select" 
+            [(ngModel)]="newReclamation.type" 
+            #type="ngModel"
+            required
+            [class.error]="type.invalid && type.touched">
+            <option value="">Sélectionnez un type</option>
+            <option value="voirie">Voirie</option>
+            <option value="eclairage">Éclairage public</option>
+            <option value="dechets">Déchets</option>
+            <option value="espaces_verts">Espaces verts</option>
+            <option value="transport">Transport</option>
+            <option value="autre">Autre</option>
+          </select>
+          <span class="error-message" *ngIf="type.invalid && type.touched">
+            Veuillez sélectionner un type
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="localisation">Localisation *</label>
+          <input 
+            type="text" 
+            id="localisation" 
+            name="localisation" 
+            class="form-control" 
+            [(ngModel)]="newReclamation.localisation" 
+            #localisation="ngModel"
+            required
+            placeholder="Adresse ou lieu précis"
+            [class.error]="localisation.invalid && localisation.touched">
+          <span class="error-message" *ngIf="localisation.invalid && localisation.touched">
+            La localisation est obligatoire
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            class="form-control" 
+            [(ngModel)]="newReclamation.description" 
+            #description="ngModel"
+            required
+            rows="4"
+            placeholder="Décrivez le problème en détail..."
+            [class.error]="description.invalid && description.touched"></textarea>
+          <span class="error-message" *ngIf="description.invalid && description.touched">
+            La description est obligatoire
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="priorite">Priorité</label>
+          <select 
+            id="priorite" 
+            name="priorite" 
+            class="form-select" 
+            [(ngModel)]="newReclamation.priorite">
+            <option value="basse">Basse</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="haute">Haute</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="reclamationForm.invalid || isSubmitting">
+            <span *ngIf="isSubmitting">Envoi en cours...</span>
+            <span *ngIf="!isSubmitting">Envoyer la réclamation</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="cancelNewReclamation()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="statutFilter">Filtrer par statut :</label>
+      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterReclamations()" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="en_attente">En attente</option>
+        <option value="en_cours">En cours</option>
+        <option value="traitee">Traitée</option>
+        <option value="rejetee">Rejetée</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tableau des réclamations -->
+  <div class="reclamations-table-container">
+    <table class="reclamations-table">
+      <thead>
+        <tr>
+          <th>Sujet</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Localisation</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reclamation of filteredReclamations" class="reclamation-row">
+          <td class="reclamation-sujet">{{ reclamation.sujet }}</td>
+          <td class="reclamation-type">
+            <span class="type-badge" [ngClass]="'type-' + reclamation.type">
+              {{ getTypeLabel(reclamation.type) }}
+            </span>
+          </td>
+          <td class="reclamation-description">{{ reclamation.description }}</td>
+          <td class="reclamation-localisation">{{ reclamation.localisation }}</td>
+          <td class="reclamation-date">{{ formatDate(reclamation.dateCreation) }}</td>
+          <td class="reclamation-statut">
+            <span class="statut-badge" [ngClass]="'statut-' + reclamation.statut">
+              {{ getStatutLabel(reclamation.statut) }}
+            </span>
+          </td>
+          <td class="reclamation-actions">
+            <button class="btn btn-sm btn-secondary">Voir</button>
+            <button class="btn btn-sm btn-primary" *ngIf="reclamation.statut === 'en_attente'">Modifier</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message si aucune réclamation -->
+  <div *ngIf="filteredReclamations.length === 0" class="no-reclamations">
+    <div class="no-reclamations-content">
+      <h3>Aucune réclamation trouvée</h3>
+      <p>Aucune réclamation ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir toutes les réclamations</button>
+    </div>
+  </div>
+</div>

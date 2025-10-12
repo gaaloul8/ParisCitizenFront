@@ -1,0 +1,88 @@
+<!-- Navbar Citoyen -->
+<nav class="navbar-citoyen">
+  <div class="navbar-container">
+    <a routerLink="/citoyen/dashboard" class="logo-citoyen">ParisCitizen</a>
+    <ul class="nav-links-citoyen">
+      <li><a routerLink="/citoyen/projets" routerLinkActive="active">Projets</a></li>
+      <li><a routerLink="/citoyen/etablissements" routerLinkActive="active">Établissements</a></li>
+      <li><a routerLink="/citoyen/mes-reclamations" routerLinkActive="active">Mes Réclamations</a></li>
+      <li><a routerLink="/citoyen/chatbot" routerLinkActive="active">Chatbot</a></li>
+      <li><a routerLink="/citoyen/profil" routerLinkActive="active">Profil</a></li>
+      <li><a href="#" (click)="logout()">Déconnexion</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">Dashboard Citoyen</h1>
+        <p style="color: var(--dark-color); margin: 0;">Votre espace personnel pour participer à la vie de votre quartier</p>
+      </div>
+      <div class="user-info" *ngIf="currentUser">
+        <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
+        <div>
+          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.prenom }} {{ currentUser.nom }}</div>
+          <div style="font-size: 0.9rem; color: var(--dark-color);">{{ currentUser.commune }} • Citoyen</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+      <div class="card">
+        <div class="card-header">📋 Mes signalements</div>
+        <p>Consultez l'état de vos signalements et créez-en de nouveaux.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir mes signalements</button>
+        <button class="btn btn-secondary" style="margin-top: 0.5rem;">Nouveau signalement</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🏘️ Projets de mon quartier</div>
+        <p>Découvrez et participez aux projets sociaux de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les projets</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">💬 Messages</div>
+        <p>Communiquez directement avec les agents municipaux de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir les messages</button>
+        <button class="btn btn-secondary" style="margin-top: 0.5rem;">Nouveau message</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">📍 Ma zone</div>
+        <p>Explorez les activités et les actualités de votre arrondissement.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Explorer ma zone</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🎯 Mes contributions</div>
+        <p>Suivez votre impact sur l'amélioration de votre quartier.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Voir mes contributions</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">⚙️ Mon profil</div>
+        <p>Gérez vos informations personnelles et vos préférences.</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;">Modifier mon profil</button>
+      </div>
+    </div>
+
+    <!-- Section d'actualités -->
+    <div style="margin-top: 3rem;">
+      <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">📰 Actualités de votre arrondissement</h2>
+      <div class="card">
+        <div class="card-header">Dernières nouvelles</div>
+        <p>Restez informé des dernières actualités et projets dans votre quartier.</p>
+        <button class="btn btn-secondary">Voir toutes les actualités</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+      <p style="color: var(--dark-color); font-style: italic;">
+        🚧 Interface en cours de développement - Les fonctionnalités seront disponibles dans les prochaines versions
+      </p>
+    </div>
+  </div>
+</div>

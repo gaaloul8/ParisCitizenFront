@@ -1,0 +1,90 @@
+<!-- Navbar Citoyen -->
+<nav class="navbar-citoyen">
+  <div class="navbar-container">
+    <a routerLink="/citoyen/dashboard" class="logo-citoyen">ParisCitizen</a>
+    <ul class="nav-links-citoyen">
+      <li><a routerLink="/citoyen/projets" routerLinkActive="active">Projets</a></li>
+      <li><a routerLink="/citoyen/etablissements" routerLinkActive="active">Établissements</a></li>
+      <li><a routerLink="/citoyen/mes-reclamations" routerLinkActive="active">Mes Réclamations</a></li>
+      <li><a routerLink="/citoyen/chatbot" routerLinkActive="active">Chatbot</a></li>
+      <li><a routerLink="/citoyen/profil" routerLinkActive="active">Profil</a></li>
+      <li><a href="#" (click)="logout()">Déconnexion</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Projets de votre quartier</h1>
+    <p>Découvrez et participez aux projets sociaux de votre arrondissement</p>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="statutFilter">Filtrer par statut :</label>
+      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterProjects()" class="form-select">
+        <option value="">Tous les statuts</option>
+        <option value="en_cours">En cours</option>
+        <option value="planifie">Planifié</option>
+        <option value="termine">Terminé</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des projets -->
+  <div class="projects-grid">
+    <div *ngFor="let projet of filteredProjects" class="project-card">
+      <div class="project-header">
+        <h3>{{ projet.titre }}</h3>
+        <span class="project-status" [ngClass]="'status-' + projet.statut">
+          {{ getStatutLabel(projet.statut) }}
+        </span>
+      </div>
+      
+      <div class="project-content">
+        <p class="project-description">{{ projet.description }}</p>
+        
+        <div class="project-details">
+          <div class="detail-item">
+            <span class="detail-label">📅 Période :</span>
+            <span class="detail-value">{{ formatDate(projet.dateDebut) }} - {{ formatDate(projet.dateFin) }}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">👤 Responsable :</span>
+            <span class="detail-value">{{ projet.responsable }}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">💰 Budget :</span>
+            <span class="detail-value">{{ projet.budget | number }} €</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">👥 Participants :</span>
+            <span class="detail-value">{{ projet.participants }} personnes</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="project-actions">
+        <button class="btn btn-primary" *ngIf="projet.statut === 'en_cours' || projet.statut === 'planifie'">
+          Participer
+        </button>
+        <button class="btn btn-secondary">
+          Plus d'infos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun projet -->
+  <div *ngIf="filteredProjects.length === 0" class="no-projects">
+    <div class="no-projects-content">
+      <h3>Aucun projet trouvé</h3>
+      <p>Aucun projet ne correspond à vos critères de filtrage.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">Voir tous les projets</button>
+    </div>
+  </div>
+</div>
