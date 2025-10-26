@@ -7,39 +7,19 @@
 
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
       <div class="form-group">
-        <label for="role">Rôle *</label>
-        <select 
-          id="role" 
-          name="role" 
-          class="form-select" 
-          [(ngModel)]="loginData.role" 
-          #role="ngModel"
-          required
-          [class.error]="role.invalid && role.touched">
-          <option value="">Sélectionnez votre rôle</option>
-          <option value="citoyen">Citoyen</option>
-          <option value="agent">Agent municipal</option>
-          <option value="admin">Administrateur</option>
-        </select>
-        <span class="error-message" *ngIf="role.invalid && role.touched">
-          Veuillez sélectionner votre rôle
-        </span>
-      </div>
-
-      <div class="form-group">
-        <label for="username">Nom d'utilisateur *</label>
+        <label for="email">Email *</label>
         <input 
-          type="text" 
-          id="username" 
-          name="username" 
+          type="email" 
+          id="email" 
+          name="email" 
           class="form-control" 
-          [(ngModel)]="loginData.username" 
-          #username="ngModel"
+          [(ngModel)]="loginData.email" 
+          #email="ngModel"
           required
-          placeholder="admin, agent ou citoyen"
-          [class.error]="username.invalid && username.touched">
-        <span class="error-message" *ngIf="username.invalid && username.touched">
-          Veuillez saisir votre nom d'utilisateur
+          placeholder="votre@email.com"
+          [class.error]="email.invalid && email.touched">
+        <span class="error-message" *ngIf="email.invalid && email.touched">
+          Veuillez saisir votre email
         </span>
       </div>
 
@@ -53,7 +33,7 @@
           [(ngModel)]="loginData.password" 
           #password="ngModel"
           required
-          placeholder="admin, agent ou citoyen"
+          placeholder="Votre mot de passe"
           [class.error]="password.invalid && password.touched">
         <span class="error-message" *ngIf="password.invalid && password.touched">
           Veuillez saisir votre mot de passe
@@ -86,10 +66,13 @@
       <div style="background: var(--light-color); padding: 1rem; border-radius: var(--border-radius); margin-top: 2rem;">
         <h4 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">🔐 Comptes de démonstration</h4>
         <div style="display: grid; gap: 0.5rem; font-size: 0.9rem;">
-          <div><strong>Administrateur:</strong> admin / admin</div>
-          <div><strong>Agent municipal:</strong> agent / agent</div>
-          <div><strong>Citoyen:</strong> citoyen / citoyen</div>
+          <div><strong>Administrateur:</strong> admin@paris.fr / admin</div>
+          <div><strong>Agent municipal:</strong> agent@paris.fr / agent</div>
+          <div><strong>Citoyen:</strong> citoyen@paris.fr / citoyen</div>
         </div>
+        <p style="font-size: 0.8rem; color: var(--dark-color); margin-top: 0.5rem; text-align: center;">
+          Le système détermine automatiquement votre rôle selon votre email
+        </p>
       </div>
     </form>
   </div>

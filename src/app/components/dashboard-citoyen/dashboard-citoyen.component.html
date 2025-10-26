@@ -21,7 +21,7 @@
         <p style="color: var(--dark-color); margin: 0;">Votre espace personnel pour participer à la vie de votre quartier</p>
       </div>
       <div class="user-info" *ngIf="currentUser">
-        <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
+        <div class="user-avatar">{{ (currentUser.prenom || currentUser.email || 'U').charAt(0).toUpperCase() }}</div>
         <div>
           <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.prenom }} {{ currentUser.nom }}</div>
           <div style="font-size: 0.9rem; color: var(--dark-color);">{{ currentUser.commune }} • Citoyen</div>

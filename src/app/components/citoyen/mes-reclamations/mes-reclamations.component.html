@@ -26,7 +26,7 @@
   <div *ngIf="showNewReclamationForm" class="new-reclamation-form">
     <div class="form-container">
       <h3>Créer une nouvelle réclamation</h3>
-      <form (ngSubmit)="onSubmitReclamation()" #reclamationForm="ngForm">
+      <form (ngSubmit)="submitNewReclamation()" #reclamationForm="ngForm">
         <div class="form-group">
           <label for="sujet">Sujet *</label>
           <input 
@@ -172,12 +172,14 @@
           <td class="reclamation-localisation">{{ reclamation.localisation }}</td>
           <td class="reclamation-date">{{ formatDate(reclamation.dateCreation) }}</td>
           <td class="reclamation-statut">
-            <span class="statut-badge" [ngClass]="'statut-' + reclamation.statut">
+            <span class="statut-badge" [ngClass]="getStatutClass(reclamation.statut)">
               {{ getStatutLabel(reclamation.statut) }}
             </span>
           </td>
           <td class="reclamation-actions">
-            <button class="btn btn-sm btn-secondary">Voir</button>
+            <button class="btn btn-sm btn-info" (click)="viewReclamation(reclamation)">
+              👁️ Voir
+            </button>
             <button class="btn btn-sm btn-primary" *ngIf="reclamation.statut === 'en_attente'">Modifier</button>
           </td>
         </tr>
@@ -191,6 +193,86 @@
       <h3>Aucune réclamation trouvée</h3>
       <p>Aucune réclamation ne correspond à vos critères de filtrage.</p>
       <button class="btn btn-primary" (click)="clearFilters()">Voir toutes les réclamations</button>
+    </div>
+  </div>
+
+  <!-- Modal de détail de la réclamation -->
+  <div *ngIf="selectedReclamation" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Détail de la réclamation #{{ selectedReclamation.id }}</h3>
+        <button class="btn-close" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4>📋 Informations générales</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Sujet :</label>
+              <span>{{ selectedReclamation.sujet }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Type :</label>
+              <span class="type-badge" [ngClass]="'type-' + selectedReclamation.type">
+                {{ getTypeLabel(selectedReclamation.type) }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Priorité :</label>
+              <span class="priorite-badge" [ngClass]="'priorite-' + selectedReclamation.priorite">
+                {{ getPrioriteLabel(selectedReclamation.priorite) }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Statut :</label>
+              <span class="statut-badge" [ngClass]="getStatutClass(selectedReclamation.statut)">
+                {{ getStatutLabel(selectedReclamation.statut) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📍 Localisation</h4>
+          <div class="detail-item">
+            <label>Adresse :</label>
+            <span>{{ selectedReclamation.localisation }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📝 Description</h4>
+          <div class="detail-item">
+            <p>{{ selectedReclamation.description }}</p>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📅 Dates</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Date de création :</label>
+              <span>{{ formatDate(selectedReclamation.dateCreation) }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedReclamation.dateTraitement">
+              <label>Date de traitement :</label>
+              <span>{{ formatDate(selectedReclamation.dateTraitement) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedReclamation.commentaires">
+          <h4>💬 Commentaires</h4>
+          <div class="detail-item">
+            <p>{{ selectedReclamation.commentaires }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Fermer</button>
+      </div>
     </div>
   </div>
 </div>

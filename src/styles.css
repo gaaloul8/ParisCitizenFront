@@ -5,11 +5,27 @@
   box-sizing: border-box;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: #333;
   background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Contenu principal */
+main {
+  margin: 0;
+  padding: 0;
+  min-height: calc(100vh - 80px);
 }
 
 /* Variables CSS */
@@ -2052,6 +2068,8 @@ body {
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  padding: 0;
 }
 
 /* Contenu principal Admin */
@@ -2060,6 +2078,9 @@ body {
   min-height: 100vh;
   background: #f8f9fa;
   padding: 2rem;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
 }
 
 /* Statistiques admin */

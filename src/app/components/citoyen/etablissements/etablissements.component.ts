@@ -20,7 +20,7 @@ export class EtablissementsComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un citoyen
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || currentUser.role !== 'citoyen') {
+    if (!currentUser || currentUser.role?.toLowerCase() !== 'citoyen') {
       this.authService.logout();
       return;
     }
@@ -29,8 +29,29 @@ export class EtablissementsComponent implements OnInit {
   }
 
   loadEtablissements(): void {
-    this.etablissements = this.citoyenService.getEtablissements();
-    this.filteredEtablissements = [...this.etablissements];
+    console.log('Chargement des établissements...');
+    this.citoyenService.getEtablissements().subscribe({
+      next: (response) => {
+        console.log('Réponse des établissements:', response);
+        console.log('Type de response:', typeof response);
+        console.log('response.content:', response.content);
+        console.log('Est un tableau:', Array.isArray(response.content));
+
+        if (response && response.content && Array.isArray(response.content)) {
+          this.etablissements = response.content;
+          this.filteredEtablissements = [...this.etablissements];
+          console.log('Établissements chargés:', this.etablissements.length);
+        } else {
+          console.error('Structure de réponse invalide:', response);
+          this.etablissements = [];
+          this.filteredEtablissements = [];
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des établissements:', error);
+        alert('Erreur lors du chargement des établissements');
+      }
+    });
   }
 
   filterEtablissements(): void {

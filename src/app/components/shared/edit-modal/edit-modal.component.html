@@ -1,0 +1,364 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-container edit-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="modal-icon">
+          <ng-container [ngSwitch]="type">
+            <span *ngSwitchCase="'citoyen'">✏️</span>
+            <span *ngSwitchCase="'agent'">✏️</span>
+            <span *ngSwitchCase="'municipalite'">✏️</span>
+          </ng-container>
+        </span>
+        <h2>
+          <ng-container [ngSwitch]="type">
+            <span *ngSwitchCase="'citoyen'">Modifier le Citoyen</span>
+            <span *ngSwitchCase="'agent'">Modifier l'Agent</span>
+            <span *ngSwitchCase="'municipalite'">Modifier la Municipalité</span>
+          </ng-container>
+        </h2>
+      </div>
+      <button class="close-btn" (click)="onClose()">
+        <span>×</span>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="modal-content">
+      
+      <!-- Agent Edit Form -->
+      <div *ngIf="type === 'agent' && getAgentData()" class="edit-section">
+        <div class="edit-card">
+          <div class="edit-header">
+            <div class="avatar">
+              <span>{{ editedData.prenom?.charAt(0) || 'A' }}{{ editedData.nom?.charAt(0) || 'A' }}</span>
+            </div>
+            <div class="header-info">
+              <h3>{{ editedData.prenom }} {{ editedData.nom }}</h3>
+              <p class="subtitle">{{ editedData.poste }} - {{ editedData.municipalite }}</p>
+              <span class="statut-badge" [ngClass]="getStatutClass(editedData.statut)">
+                {{ getStatutLabel(editedData.statut) }}
+              </span>
+            </div>
+          </div>
+          
+          <form class="edit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-nom">Nom *</label>
+                <input 
+                  type="text" 
+                  id="edit-nom" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.nom"
+                  name="nom">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-prenom">Prénom *</label>
+                <input 
+                  type="text" 
+                  id="edit-prenom" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.prenom"
+                  name="prenom">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-email">Email *</label>
+                <input 
+                  type="email" 
+                  id="edit-email" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.email"
+                  name="email">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-telephone">Téléphone</label>
+                <input 
+                  type="tel" 
+                  id="edit-telephone" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.telephone"
+                  name="telephone">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-poste">Poste *</label>
+                <input 
+                  type="text" 
+                  id="edit-poste" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.poste"
+                  name="poste">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-statut">Statut *</label>
+                <select 
+                  id="edit-statut" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.statut"
+                  name="statut">
+                  <option value="actif">Actif</option>
+                  <option value="inactif">Inactif</option>
+                  <option value="suspendu">Suspendu</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-municipalite">Municipalité *</label>
+                <select 
+                  id="edit-municipalite" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.municipalite"
+                  name="municipalite">
+                  <option *ngFor="let municipalite of municipalites" [value]="municipalite.nom">
+                    {{ municipalite.nom }}
+                  </option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-dateEmbauche">Date d'embauche</label>
+                <input 
+                  type="date" 
+                  id="edit-dateEmbauche" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.dateEmbauche"
+                  name="dateEmbauche">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Municipalité Edit Form -->
+      <div *ngIf="type === 'municipalite' && getMunicipaliteData()" class="edit-section">
+        <div class="edit-card">
+          <div class="edit-header">
+            <div class="avatar municipalite-avatar">
+              <span>🏛️</span>
+            </div>
+            <div class="header-info">
+              <h3>{{ editedData.nom }}</h3>
+              <p class="subtitle">{{ editedData.region }} - {{ editedData.codePostal }}</p>
+              <span class="statut-badge" [ngClass]="getStatutClass(editedData.statut)">
+                {{ getStatutLabel(editedData.statut) }}
+              </span>
+            </div>
+          </div>
+          
+          <form class="edit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-nom-muni">Nom *</label>
+                <input 
+                  type="text" 
+                  id="edit-nom-muni" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.nom"
+                  name="nom">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-region">Région *</label>
+                <input 
+                  type="text" 
+                  id="edit-region" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.region"
+                  name="region">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-codePostal">Code Postal *</label>
+                <input 
+                  type="text" 
+                  id="edit-codePostal" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.codePostal"
+                  name="codePostal"
+                  pattern="[0-9]{5}">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-budgetAnnuel">Budget Annuel (€) *</label>
+                <input 
+                  type="number" 
+                  id="edit-budgetAnnuel" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.budgetAnnuel"
+                  name="budgetAnnuel"
+                  min="0">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-statut-muni">Statut *</label>
+                <select 
+                  id="edit-statut-muni" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.statut"
+                  name="statut">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-dateCreation">Date de création</label>
+                <input 
+                  type="date" 
+                  id="edit-dateCreation" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.dateCreation"
+                  name="dateCreation">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Citoyen Edit Form -->
+      <div *ngIf="type === 'citoyen' && getCitoyenData()" class="edit-section">
+        <div class="edit-card">
+          <div class="edit-header">
+            <div class="avatar">
+              <span>{{ editedData.prenom?.charAt(0) || 'C' }}{{ editedData.nom?.charAt(0) || 'C' }}</span>
+            </div>
+            <div class="header-info">
+              <h3>{{ editedData.prenom }} {{ editedData.nom }}</h3>
+              <p class="subtitle">{{ editedData.commune }}</p>
+              <span class="statut-badge" [ngClass]="getStatutClass(editedData.statut)">
+                {{ getStatutLabel(editedData.statut) }}
+              </span>
+            </div>
+          </div>
+          
+          <form class="edit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-nom-cit">Nom *</label>
+                <input 
+                  type="text" 
+                  id="edit-nom-cit" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.nom"
+                  name="nom">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-prenom-cit">Prénom *</label>
+                <input 
+                  type="text" 
+                  id="edit-prenom-cit" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.prenom"
+                  name="prenom">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-email-cit">Email *</label>
+                <input 
+                  type="email" 
+                  id="edit-email-cit" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.email"
+                  name="email">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-age">Âge</label>
+                <input 
+                  type="number" 
+                  id="edit-age" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.age"
+                  name="age"
+                  min="0"
+                  max="120">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-telephone-cit">Téléphone</label>
+                <input 
+                  type="tel" 
+                  id="edit-telephone-cit" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.telephone"
+                  name="telephone">
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-commune">Commune</label>
+                <input 
+                  type="text" 
+                  id="edit-commune" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.commune"
+                  name="commune">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-statut-cit">Statut *</label>
+                <select 
+                  id="edit-statut-cit" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.statut"
+                  name="statut">
+                  <option value="actif">Actif</option>
+                  <option value="inactif">Inactif</option>
+                  <option value="suspendu">Suspendu</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-adresse">Adresse</label>
+                <textarea 
+                  id="edit-adresse" 
+                  class="form-control" 
+                  [(ngModel)]="editedData.adresse"
+                  name="adresse"
+                  rows="2"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()">
+        Annuler
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="onSave()"
+        [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting">Sauvegarde...</span>
+        <span *ngIf="!isSubmitting">Sauvegarder</span>
+      </button>
+    </div>
+  </div>
+</div>

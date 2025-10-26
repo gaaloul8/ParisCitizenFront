@@ -32,7 +32,7 @@
       <div class="profile-info" *ngIf="currentUser">
         <div class="profile-avatar">
           <div class="avatar-circle">
-            {{ currentUser.prenom?.charAt(0) || currentUser.username.charAt(0).toUpperCase() }}
+            {{ (currentUser.prenom || currentUser.nom || currentUser.email || 'A').charAt(0).toUpperCase() }}
           </div>
           <h3>{{ currentUser.prenom }} {{ currentUser.nom }}</h3>
           <p class="profile-role">Citoyen • {{ currentUser.commune }}</p>
@@ -81,7 +81,7 @@
           
           <div class="detail-item">
             <span class="detail-label">👤 Nom d'utilisateur :</span>
-            <span class="detail-value">{{ currentUser.username }}</span>
+            <span class="detail-value">{{ currentUser.prenom }} {{ currentUser.nom }}</span>
           </div>
           
           <div class="detail-item">

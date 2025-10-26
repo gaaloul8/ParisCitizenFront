@@ -55,6 +55,176 @@
       <h1>Gestion des Agents Municipaux</h1>
       <p>Supervision et gestion de tous les agents municipaux de la plateforme</p>
     </div>
+    <button class="btn btn-primary" (click)="showAddForm = !showAddForm">
+      ➕ Ajouter un agent
+    </button>
+  </div>
+
+  <!-- Formulaire d'ajout -->
+  <div class="add-agent-form" *ngIf="showAddForm">
+    <div class="form-container">
+      <div class="form-header">
+        <h3>Ajouter un nouvel agent</h3>
+        <button class="close-btn" (click)="showAddForm = false">×</button>
+      </div>
+      
+      <form (ngSubmit)="onSubmitAgent()" #agentForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Nom d'utilisateur *</label>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              class="form-control" 
+              [(ngModel)]="newAgent.username" 
+              #username="ngModel"
+              required
+              [class.error]="username.invalid && username.touched">
+            <span class="error-message" *ngIf="username.invalid && username.touched">
+              Le nom d'utilisateur est obligatoire
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Mot de passe *</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-control" 
+              [(ngModel)]="newAgent.password" 
+              #password="ngModel"
+              required
+              minlength="6"
+              [class.error]="password.invalid && password.touched">
+            <span class="error-message" *ngIf="password.invalid && password.touched">
+              Le mot de passe doit contenir au moins 6 caractères
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input 
+              type="text" 
+              id="nom" 
+              name="nom" 
+              class="form-control" 
+              [(ngModel)]="newAgent.nom" 
+              #nom="ngModel"
+              required
+              [class.error]="nom.invalid && nom.touched">
+            <span class="error-message" *ngIf="nom.invalid && nom.touched">
+              Le nom est obligatoire
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="prenom">Prénom *</label>
+            <input 
+              type="text" 
+              id="prenom" 
+              name="prenom" 
+              class="form-control" 
+              [(ngModel)]="newAgent.prenom" 
+              #prenom="ngModel"
+              required
+              [class.error]="prenom.invalid && prenom.touched">
+            <span class="error-message" *ngIf="prenom.invalid && prenom.touched">
+              Le prénom est obligatoire
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-control" 
+              [(ngModel)]="newAgent.email" 
+              #email="ngModel"
+              required
+              email
+              [class.error]="email.invalid && email.touched">
+            <span class="error-message" *ngIf="email.invalid && email.touched">
+              L'email est obligatoire et doit être valide
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="telephone">Téléphone</label>
+            <input 
+              type="tel" 
+              id="telephone" 
+              name="telephone" 
+              class="form-control" 
+              [(ngModel)]="newAgent.telephone">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="municipaliteId">Municipalité *</label>
+            <select 
+              id="municipaliteId" 
+              name="municipaliteId" 
+              class="form-control" 
+              [(ngModel)]="newAgent.municipaliteId" 
+              #municipaliteId="ngModel"
+              required
+              [class.error]="municipaliteId.invalid && municipaliteId.touched">
+              <option value="">Sélectionner une municipalité</option>
+              <option *ngFor="let municipalite of municipalites" [value]="municipalite.id">
+                {{ municipalite.nom }}
+              </option>
+            </select>
+            <span class="error-message" *ngIf="municipaliteId.invalid && municipaliteId.touched">
+              La municipalité est obligatoire
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="poste">Poste *</label>
+            <input 
+              type="text" 
+              id="poste" 
+              name="poste" 
+              class="form-control" 
+              [(ngModel)]="newAgent.poste" 
+              #poste="ngModel"
+              required
+              [class.error]="poste.invalid && poste.touched">
+            <span class="error-message" *ngIf="poste.invalid && poste.touched">
+              Le poste est obligatoire
+            </span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="agentForm.invalid || isSubmitting">
+            <span *ngIf="isSubmitting">Ajout...</span>
+            <span *ngIf="!isSubmitting">Ajouter l'agent</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="cancelAddAgent()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="page-header">
     <div class="header-stats">
       <div class="stat-item">
         <span class="stat-number">{{ getTotalAgents() }}</span>
@@ -71,30 +241,6 @@
     </div>
   </div>
 
-  <!-- Filtres -->
-  <div class="filters-section">
-    <div class="filter-group">
-      <label for="municipaliteFilter">Filtrer par municipalité :</label>
-      <select id="municipaliteFilter" [(ngModel)]="municipaliteFilter" (change)="filterAgents()" class="form-select">
-        <option value="">Toutes les municipalités</option>
-        <option value="1er arrondissement">1er arrondissement</option>
-        <option value="15ème arrondissement">15ème arrondissement</option>
-        <option value="20ème arrondissement">20ème arrondissement</option>
-        <option value="11ème arrondissement">11ème arrondissement</option>
-        <option value="18ème arrondissement">18ème arrondissement</option>
-      </select>
-    </div>
-    
-    <div class="filter-group">
-      <label for="statutFilter">Filtrer par statut :</label>
-      <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterAgents()" class="form-select">
-        <option value="">Tous les statuts</option>
-        <option value="actif">Actif</option>
-        <option value="inactif">Inactif</option>
-        <option value="suspendu">Suspendu</option>
-      </select>
-    </div>
-  </div>
 
   <!-- Liste des agents -->
   <div class="agents-table-container">
@@ -114,7 +260,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let agent of filteredAgents" class="agent-row">
+        <tr *ngFor="let agent of agents" class="agent-row">
           <td class="agent-nom">{{ agent.prenom }} {{ agent.nom }}</td>
           <td class="agent-municipalite">{{ agent.municipalite }}</td>
           <td class="agent-poste">{{ agent.poste }}</td>
@@ -136,18 +282,17 @@
             </span>
           </td>
           <td class="agent-actions">
-            <button class="btn btn-sm btn-info" (click)="viewAgent(agent)">
-              👁️ Voir
-            </button>
-            <button class="btn btn-sm btn-secondary" (click)="editAgent(agent)">
-              ✏️ Modifier
-            </button>
-            <select class="statut-select" (change)="updateAgentStatus(agent.id, $event)">
-              <option value="">Changer statut</option>
-              <option value="actif">Actif</option>
-              <option value="inactif">Inactif</option>
-              <option value="suspendu">Suspendu</option>
-            </select>
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-info" (click)="viewAgent(agent)" title="Voir les détails">
+                👁️
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="editAgent(agent)" title="Modifier">
+                ✏️
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="supprimerAgent(agent)" title="Supprimer">
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -155,11 +300,33 @@
   </div>
 
   <!-- Message si aucun agent -->
-  <div *ngIf="filteredAgents.length === 0" class="no-agents">
+  <div *ngIf="agents.length === 0" class="no-agents">
     <div class="no-agents-content">
       <h3>Aucun agent trouvé</h3>
-      <p>Aucun agent ne correspond à vos critères de filtrage.</p>
-      <button class="btn btn-primary" (click)="clearFilters()">Voir tous les agents</button>
+      <p>Commencez par ajouter votre premier agent.</p>
+      <button class="btn btn-primary" (click)="showAddForm = true">Ajouter un agent</button>
     </div>
   </div>
 </div>
+
+<!-- Modal pour afficher les détails -->
+<app-detail-modal 
+  [isOpen]="showModal"
+  [data]="selectedAgent"
+  type="agent"
+  (closeModal)="closeModal()">
+</app-detail-modal>
+
+<!-- Modal pour modifier -->
+<app-edit-modal 
+  [isOpen]="showEditModal"
+  [data]="editingAgent"
+  [municipalites]="municipalites"
+  type="agent"
+  (closeModal)="closeEditModal()"
+  (saveChanges)="onSaveAgentChanges($event)">
+</app-edit-modal>
+
+
+
+

@@ -21,19 +21,85 @@ export class ReclamationsAgentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('=== INIT ReclamationsAgentComponent ===');
+    
     // Vérifier que l'utilisateur est bien un agent
     this.currentUser = this.authService.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'agent') {
+    console.log('Utilisateur récupéré:', this.currentUser);
+    
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'agent') {
+      console.error('Utilisateur non autorisé ou non connecté');
+      console.error('Rôle actuel:', this.currentUser?.role);
       this.authService.logout();
       return;
     }
 
+    console.log('Utilisateur autorisé, chargement des réclamations...');
     this.loadReclamations();
   }
 
   loadReclamations(): void {
-    this.reclamations = this.agentService.getReclamations();
-    this.filteredReclamations = [...this.reclamations];
+    console.log('=== DÉBUT loadReclamations ===');
+    console.log('currentUser:', this.currentUser);
+    console.log('currentUser.id:', this.currentUser?.id);
+    
+    if (!this.currentUser || !this.currentUser.id) {
+      console.error('Utilisateur non connecté ou ID manquant');
+      console.log('Tentative de chargement de toutes les réclamations...');
+      this.loadAllReclamations();
+      return;
+    }
+
+    console.log('Tentative de chargement des réclamations pour l\'agent ID:', this.currentUser.id);
+    
+    // Essayer d'abord les réclamations assignées à l'agent
+    this.agentService.getReclamationsByAgent(this.currentUser.id).subscribe({
+      next: (response) => {
+        console.log('Réponse des réclamations assignées:', response);
+        this.reclamations = response.content;
+        this.filteredReclamations = [...this.reclamations];
+        console.log('Réclamations assignées à l\'agent:', this.reclamations);
+        console.log('Nombre de réclamations assignées:', this.reclamations.length);
+        
+        // Vérifier la structure des réclamations
+        if (this.reclamations.length > 0) {
+          console.log('Structure de la première réclamation:', this.reclamations[0]);
+          console.log('Citoyen de la première réclamation:', this.reclamations[0].citoyen);
+        }
+        
+        // Si aucune réclamation assignée, charger toutes les réclamations
+        if (this.reclamations.length === 0) {
+          console.log('Aucune réclamation assignée, chargement de toutes les réclamations...');
+          this.loadAllReclamations();
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des réclamations assignées:', error);
+        console.log('Tentative de chargement de toutes les réclamations...');
+        // En cas d'erreur, charger toutes les réclamations
+        this.loadAllReclamations();
+      }
+    });
+  }
+
+  loadAllReclamations(): void {
+    console.log('=== DÉBUT loadAllReclamations ===');
+    console.log('Chargement de toutes les réclamations...');
+    
+    this.agentService.getReclamations().subscribe({
+      next: (response) => {
+        console.log('Réponse de toutes les réclamations:', response);
+        this.reclamations = response.content;
+        this.filteredReclamations = [...this.reclamations];
+        console.log('Toutes les réclamations chargées:', this.reclamations);
+        console.log('Nombre total de réclamations:', this.reclamations.length);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement de toutes les réclamations:', error);
+        console.error('Détails de l\'erreur:', error);
+        alert('Erreur lors du chargement des réclamations');
+      }
+    });
   }
 
   filterReclamations(): void {
@@ -81,27 +147,6 @@ export class ReclamationsAgentComponent implements OnInit {
     }
   }
 
-  updateReclamationStatus(reclamationId: number, event: any): void {
-    const nouveauStatut = event.target.value;
-    if (nouveauStatut) {
-      const success = this.agentService.mettreAJourStatutReclamation(
-        reclamationId, 
-        nouveauStatut as ReclamationAgent['statut']
-      );
-      
-      if (success) {
-        this.loadReclamations();
-        if (this.selectedReclamation && this.selectedReclamation.id === reclamationId) {
-          this.selectedReclamation.statut = nouveauStatut as ReclamationAgent['statut'];
-          if (nouveauStatut === 'traitee') {
-            this.selectedReclamation.dateTraitement = new Date().toISOString().split('T')[0];
-          }
-        }
-        alert('Statut de la réclamation mis à jour !');
-      }
-      event.target.value = ''; // Reset select
-    }
-  }
 
   getNouvellesReclamations(): number {
     return this.reclamations.filter(r => r.statut === 'nouvelle').length;
@@ -125,6 +170,110 @@ export class ReclamationsAgentComponent implements OnInit {
 
   getPrioriteLabel(priorite: string): string {
     return this.agentService.getPrioriteLabel(priorite);
+  }
+
+  // Méthode pour obtenir la classe CSS du statut
+  getStatutClass(statut: string): string {
+    switch (statut.toLowerCase()) {
+      case 'nouvelle':
+        return 'statut-nouvelle';
+      case 'en_cours':
+        return 'statut-en-cours';
+      case 'traitee':
+        return 'statut-traitee';
+      case 'rejetee':
+        return 'statut-rejetee';
+      default:
+        return 'statut-default';
+    }
+  }
+
+  // Méthode pour modifier le statut d'une réclamation
+  updateStatut(reclamation: ReclamationAgent, newStatut: string, commentaires?: string): void {
+    console.log('=== Mise à jour du statut ===');
+    console.log('Réclamation ID:', reclamation.id);
+    console.log('Nouveau statut:', newStatut);
+    console.log('Commentaires:', commentaires);
+
+    this.agentService.mettreAJourStatutReclamation(reclamation.id, newStatut, commentaires).subscribe({
+      next: (updatedReclamation) => {
+        console.log('Statut mis à jour avec succès:', updatedReclamation);
+        
+        // Mettre à jour la réclamation dans la liste
+        const index = this.reclamations.findIndex(r => r.id === reclamation.id);
+        if (index !== -1) {
+          this.reclamations[index] = updatedReclamation;
+          this.filteredReclamations = [...this.reclamations];
+        }
+        
+        // Mettre à jour la réclamation sélectionnée si c'est la même
+        if (this.selectedReclamation && this.selectedReclamation.id === reclamation.id) {
+          this.selectedReclamation = updatedReclamation;
+        }
+        
+        alert('Statut mis à jour avec succès !');
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour du statut:', error);
+        alert('Erreur lors de la mise à jour du statut');
+      }
+    });
+  }
+
+  // Méthode pour obtenir les options de statut disponibles
+  getStatutOptions(): Array<{value: string, label: string}> {
+    return [
+      { value: 'nouvelle', label: 'Nouvelle' },
+      { value: 'en_cours', label: 'En cours' },
+      { value: 'traitee', label: 'Traitée' },
+      { value: 'rejetee', label: 'Rejetée' }
+    ];
+  }
+
+  // Méthode pour mettre à jour le statut via le sélecteur
+  updateReclamationStatus(reclamationId: number, event: any): void {
+    const newStatut = event.target.value;
+    if (!newStatut) return;
+
+    console.log('=== Mise à jour du statut via sélecteur ===');
+    console.log('Réclamation ID:', reclamationId);
+    console.log('Nouveau statut:', newStatut);
+
+    // Trouver la réclamation dans la liste
+    const reclamation = this.reclamations.find(r => r.id === reclamationId);
+    if (!reclamation) {
+      console.error('Réclamation non trouvée');
+      return;
+    }
+
+    this.agentService.mettreAJourStatutReclamation(reclamationId, newStatut).subscribe({
+      next: (updatedReclamation) => {
+        console.log('Statut mis à jour avec succès:', updatedReclamation);
+        
+        // Mettre à jour la réclamation dans la liste
+        const index = this.reclamations.findIndex(r => r.id === reclamationId);
+        if (index !== -1) {
+          this.reclamations[index] = updatedReclamation;
+          this.filteredReclamations = [...this.reclamations];
+        }
+        
+        // Mettre à jour la réclamation sélectionnée si c'est la même
+        if (this.selectedReclamation && this.selectedReclamation.id === reclamationId) {
+          this.selectedReclamation = updatedReclamation;
+        }
+        
+        // Réinitialiser le sélecteur
+        event.target.value = '';
+        
+        alert('Statut mis à jour avec succès !');
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour du statut:', error);
+        alert('Erreur lors de la mise à jour du statut');
+        // Réinitialiser le sélecteur en cas d'erreur
+        event.target.value = '';
+      }
+    });
   }
 
   formatDate(dateString: string): string {

@@ -22,7 +22,7 @@ export class ChatbotComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un citoyen
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || currentUser.role !== 'citoyen') {
+    if (!currentUser || currentUser.role?.toLowerCase() !== 'citoyen') {
       this.authService.logout();
       return;
     }
@@ -37,18 +37,61 @@ export class ChatbotComponent implements OnInit {
     if (!this.currentMessage.trim() || !this.selectedAgent) return;
 
     // Ajouter le message de l'utilisateur
-    this.citoyenService.ajouterMessage(this.currentMessage, this.selectedAgent);
+    this.citoyenService.ajouterMessageUtilisateur(this.currentMessage, this.selectedAgent);
     
     // Simuler la frappe du bot
     this.isTyping = true;
     this.scrollToBottom();
     
-    // Simuler une réponse après 1-2 secondes
-    setTimeout(() => {
-      const response = this.citoyenService.getReponseChatbot(this.currentMessage, this.selectedAgent);
-      this.isTyping = false;
-      this.scrollToBottom();
-    }, 1500);
+    // Utiliser n8n pour tous les agents
+    console.log('Agent sélectionné:', this.selectedAgent);
+    console.log('Type d\'agent:', typeof this.selectedAgent);
+    console.log('Comparaison avec "projet":', this.selectedAgent === 'projet');
+    console.log('Comparaison avec "reclamation":', this.selectedAgent === 'reclamation');
+    console.log('Comparaison avec "etablissement":', this.selectedAgent === 'etablissement');
+    
+    if (this.selectedAgent === 'reclamation' || this.selectedAgent === 'projet' || this.selectedAgent === 'etablissement') {
+      console.log('Utilisation de n8n pour l\'agent:', this.selectedAgent);
+      console.log('Envoi du message à n8n:', this.currentMessage);
+      this.citoyenService.getReponseChatbotN8n(this.currentMessage, this.selectedAgent).subscribe({
+        next: (response) => {
+          console.log('=== RÉPONSE N8N ===');
+          console.log('Réponse complète:', response);
+          console.log('Type de réponse:', typeof response);
+          console.log('Contenu de la réponse:', response.contenu);
+          console.log('==================');
+          
+          // Vérifier que le contenu n'est pas vide
+          if (response.contenu && response.contenu.trim() !== '') {
+            this.citoyenService.ajouterMessage(response.contenu, this.selectedAgent);
+            console.log('Message ajouté au chat:', response.contenu);
+          } else {
+            console.warn('Contenu vide reçu de n8n');
+            this.citoyenService.ajouterMessage('Désolé, je n\'ai pas reçu de réponse valide.', this.selectedAgent);
+          }
+          
+          this.isTyping = false;
+          this.scrollToBottom();
+        },
+        error: (error) => {
+          console.error('Erreur avec le chatbot n8n:', error);
+          // Fallback vers la réponse simulée en cas d'erreur
+          const fallbackResponse = this.citoyenService.getReponseChatbot(this.currentMessage, this.selectedAgent);
+          console.log('Utilisation du fallback:', fallbackResponse.contenu);
+          this.citoyenService.ajouterMessage(fallbackResponse.contenu, this.selectedAgent);
+          this.isTyping = false;
+          this.scrollToBottom();
+        }
+      });
+    } else {
+      // Simuler une réponse après 1-2 secondes pour les autres agents
+      setTimeout(() => {
+        const response = this.citoyenService.getReponseChatbot(this.currentMessage, this.selectedAgent);
+        this.citoyenService.ajouterMessage(response.contenu, this.selectedAgent);
+        this.isTyping = false;
+        this.scrollToBottom();
+      }, 1500);
+    }
 
     this.currentMessage = '';
   }

@@ -54,25 +54,23 @@ export class RegisterComponent {
     }
 
     // Tentative d'inscription
-    try {
-      const success = this.authService.register(
-        this.registerData.nom,
-        this.registerData.prenom,
-        this.registerData.email,
-        this.registerData.password,
-        this.registerData.commune
-      );
-
-      if (success) {
+    this.authService.register(
+      this.registerData.nom,
+      this.registerData.prenom,
+      this.registerData.email,
+      this.registerData.password,
+      this.registerData.commune
+    ).subscribe({
+      next: (response) => {
         this.successMessage = 'Inscription réussie ! Redirection en cours...';
         // La redirection est gérée par le service d'authentification
-      } else {
-        this.errorMessage = 'Erreur lors de l\'inscription. Veuillez réessayer.';
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur d\'inscription:', error);
+        this.errorMessage = error.message || 'Une erreur est survenue lors de l\'inscription.';
+        this.isLoading = false;
       }
-    } catch (error) {
-      this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 }

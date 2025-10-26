@@ -25,9 +25,10 @@
       <label for="statutFilter">Filtrer par statut :</label>
       <select id="statutFilter" [(ngModel)]="statutFilter" (change)="filterProjects()" class="form-select">
         <option value="">Tous les statuts</option>
-        <option value="en_cours">En cours</option>
-        <option value="planifie">Planifié</option>
-        <option value="termine">Terminé</option>
+        <option value="ACTIF">En cours</option>
+        <option value="PLANIFIE">Planifié</option>
+        <option value="TERMINE">Terminé</option>
+        <option value="BROUILLON">Brouillon</option>
       </select>
     </div>
   </div>
@@ -69,10 +70,7 @@
       </div>
       
       <div class="project-actions">
-        <button class="btn btn-primary" *ngIf="projet.statut === 'en_cours' || projet.statut === 'planifie'">
-          Participer
-        </button>
-        <button class="btn btn-secondary">
+        <button class="btn btn-secondary" (click)="openProjectDetails(projet)">
           Plus d'infos
         </button>
       </div>
@@ -85,6 +83,75 @@
       <h3>Aucun projet trouvé</h3>
       <p>Aucun projet ne correspond à vos critères de filtrage.</p>
       <button class="btn btn-primary" (click)="clearFilters()">Voir tous les projets</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de détails du projet -->
+<div *ngIf="showProjectDetailsModal" class="modal-overlay" (click)="closeProjectDetailsModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ selectedProjet?.titre }}</h3>
+      <button class="btn-close" (click)="closeProjectDetailsModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="project-details-section">
+        <div class="detail-section">
+          <h3>📋 Description</h3>
+          <p>{{ selectedProjet?.description }}</p>
+        </div>
+        
+        <div class="detail-section">
+          <h3>📅 Période</h3>
+          <p>{{ formatDate(selectedProjet?.dateDebut) }} - {{ formatDate(selectedProjet?.dateFin) }}</p>
+        </div>
+        
+        <div class="detail-section">
+          <h3>👤 Responsable</h3>
+          <p>{{ selectedProjet?.responsable }}</p>
+        </div>
+        
+        <div class="detail-section">
+          <h3>💰 Budget</h3>
+          <p>{{ selectedProjet?.budget | number }} €</p>
+        </div>
+        
+        <div class="detail-section">
+          <h3>👥 Participants actuels</h3>
+          <p>{{ selectedProjet?.participants }} personnes</p>
+        </div>
+        
+        <div class="detail-section" *ngIf="selectedProjet?.arrondissement">
+          <h3>🏘️ Arrondissement</h3>
+          <p>{{ selectedProjet?.arrondissement }}</p>
+        </div>
+        
+        <div class="detail-section" *ngIf="selectedProjet?.image">
+          <h3>🖼️ Image</h3>
+          <p>{{ selectedProjet?.image }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button 
+        class="btn btn-primary" 
+        *ngIf="selectedProjet && (selectedProjet.statut === 'ACTIF' || selectedProjet.statut === 'PLANIFIE') && !isParticipatingInProject(selectedProjet.id)"
+        (click)="participerDirectement(selectedProjet)"
+        [disabled]="participationLoading">
+        <span *ngIf="participationLoading">Participation...</span>
+        <span *ngIf="!participationLoading">Participer</span>
+      </button>
+      <button 
+        class="btn btn-danger" 
+        *ngIf="selectedProjet && (selectedProjet.statut === 'ACTIF' || selectedProjet.statut === 'PLANIFIE') && isParticipatingInProject(selectedProjet.id)"
+        (click)="annulerParticipationDirectement(selectedProjet)"
+        [disabled]="participationLoading">
+        <span *ngIf="participationLoading">Annulation...</span>
+        <span *ngIf="!participationLoading">Annuler participation</span>
+      </button>
+      <button class="btn btn-secondary" (click)="closeProjectDetailsModal()">Fermer</button>
     </div>
   </div>
 </div>

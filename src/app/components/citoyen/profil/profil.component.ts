@@ -13,6 +13,9 @@ export class ProfilComponent implements OnInit {
   isEditMode = false;
   isSaving = false;
   isSavingPreferences = false;
+  
+  // Données pour les statistiques
+  reclamations: any[] = [];
 
   preferences = {
     notificationsEmail: true,
@@ -28,13 +31,25 @@ export class ProfilComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un citoyen
     this.currentUser = this.authService.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'citoyen') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'citoyen') {
       this.authService.logout();
       return;
     }
 
     this.editedUser = { ...this.currentUser };
     this.loadPreferences();
+    this.loadReclamations();
+  }
+
+  loadReclamations(): void {
+    this.citoyenService.getReclamations().subscribe({
+      next: (response) => {
+        this.reclamations = response.content;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des réclamations:', error);
+      }
+    });
   }
 
   toggleEditMode(): void {
@@ -105,11 +120,11 @@ export class ProfilComponent implements OnInit {
   }
 
   getReclamationsCount(): number {
-    return this.citoyenService.getReclamations().length;
+    return this.reclamations.length;
   }
 
   getTreatedReclamationsCount(): number {
-    return this.citoyenService.getReclamationsByStatut('traitee').length;
+    return this.reclamations.filter(r => r.statut === 'traitee').length;
   }
 
   getParticipationsCount(): number {

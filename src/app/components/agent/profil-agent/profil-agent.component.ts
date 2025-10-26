@@ -13,6 +13,10 @@ export class ProfilAgentComponent implements OnInit {
   isEditMode = false;
   isSaving = false;
   isSavingPreferences = false;
+  
+  // Données pour les statistiques
+  reclamations: ReclamationAgent[] = [];
+  projets: ProjetAgent[] = [];
 
   preferences = {
     notificationsEmail: true,
@@ -28,7 +32,7 @@ export class ProfilAgentComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un agent
     this.currentUser = this.authService.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'agent') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'agent') {
       this.authService.logout();
       return;
     }
@@ -43,6 +47,32 @@ export class ProfilAgentComponent implements OnInit {
       municipalite: this.getMunicipality(),
       telephone: this.getAgentPhone()
     };
+    
+    // Charger les données pour les statistiques
+    this.loadReclamations();
+    this.loadProjets();
+  }
+  
+  loadReclamations(): void {
+    this.agentService.getReclamations().subscribe({
+      next: (response) => {
+        this.reclamations = response.content;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des réclamations:', error);
+      }
+    });
+  }
+  
+  loadProjets(): void {
+    this.agentService.getProjets().subscribe({
+      next: (response) => {
+        this.projets = response.content;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des projets:', error);
+      }
+    });
   }
 
   toggleEditMode(): void {
@@ -121,17 +151,17 @@ export class ProfilAgentComponent implements OnInit {
   }
 
   getTotalReclamations(): number {
-    return this.agentService.getReclamations().length;
+    return this.reclamations.length;
   }
 
   getTauxResolution(): number {
-    const total = this.agentService.getReclamations().length;
-    const traitees = this.agentService.getReclamationsByStatut('traitee').length;
+    const total = this.reclamations.length;
+    const traitees = this.reclamations.filter(r => r.statut === 'traitee').length;
     return total > 0 ? Math.round((traitees / total) * 100) : 0;
   }
 
   getTotalProjets(): number {
-    return this.agentService.getProjets().length;
+    return this.projets.length;
   }
 
   getNoteSatisfaction(): number {
@@ -140,11 +170,11 @@ export class ProfilAgentComponent implements OnInit {
   }
 
   getRecentReclamations(): ReclamationAgent[] {
-    return this.agentService.getReclamations().slice(0, 5);
+    return this.reclamations.slice(0, 5);
   }
 
   getActiveProjects(): ProjetAgent[] {
-    return this.agentService.getProjets().filter(p => p.statut === 'actif');
+    return this.projets.filter(p => p.statut === 'actif');
   }
 
   getStatutLabel(statut: string): string {

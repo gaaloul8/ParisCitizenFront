@@ -3,8 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
 interface LoginData {
-  role: 'admin' | 'agent' | 'citoyen' | '';
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -15,8 +14,7 @@ interface LoginData {
 })
 export class LoginComponent {
   loginData: LoginData = {
-    role: '',
-    username: '',
+    email: '',
     password: ''
   };
 
@@ -33,28 +31,40 @@ export class LoginComponent {
     this.errorMessage = '';
 
     // Validation côté client
-    if (!this.loginData.role || !this.loginData.username || !this.loginData.password) {
+    if (!this.loginData.email || !this.loginData.password) {
       this.errorMessage = 'Veuillez remplir tous les champs';
       this.isLoading = false;
       return;
     }
 
     // Tentative de connexion
-    try {
-      const success = this.authService.login(
-        this.loginData.username,
-        this.loginData.password,
-        this.loginData.role as 'admin' | 'agent' | 'citoyen'
-      );
-
-      if (!success) {
-        this.errorMessage = 'Identifiants incorrects. Veuillez vérifier vos informations.';
+    console.log('Tentative de connexion avec:', this.loginData.email);
+    this.authService.login(
+      this.loginData.email,
+      this.loginData.password
+    ).subscribe({
+      next: (response) => {
+        // La redirection est gérée par le service
+        console.log('Connexion réussie:', response);
+        console.log('Rôle détecté:', response.user.role);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur de connexion complète:', error);
+        console.error('Status:', error.status);
+        console.error('Message:', error.message);
+        console.error('Error body:', error.error);
+        
+        // Message d'erreur plus spécifique
+        if (error.status === 401) {
+          this.errorMessage = 'Email ou mot de passe incorrect.';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Impossible de se connecter au serveur. Vérifiez que le backend est démarré.';
+        } else {
+          this.errorMessage = `Erreur de connexion (${error.status}): ${error.message || 'Veuillez vérifier vos informations.'}`;
+        }
+        this.isLoading = false;
       }
-      // Si la connexion réussit, la redirection est gérée par le service
-    } catch (error) {
-      this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 }

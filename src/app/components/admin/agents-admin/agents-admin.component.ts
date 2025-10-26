@@ -10,9 +10,29 @@ import { AdminService, AgentMunicipal } from '../../../services/admin.service';
 export class AgentsAdminComponent implements OnInit {
   currentUser: User | null = null;
   agents: AgentMunicipal[] = [];
-  filteredAgents: AgentMunicipal[] = [];
-  municipaliteFilter: string = '';
-  statutFilter: string = '';
+  
+  // Modal properties
+  showModal: boolean = false;
+  selectedAgent: AgentMunicipal | null = null;
+  showEditModal: boolean = false;
+  editingAgent: AgentMunicipal | null = null;
+  
+  // Formulaire d'ajout
+  showAddForm = false;
+  isSubmitting = false;
+  
+  newAgent = {
+    username: '',
+    password: '',
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    municipaliteId: 0,
+    poste: ''
+  };
+  
+  municipalites: any[] = [];
 
   constructor(
     private authService: AuthService,
@@ -22,37 +42,124 @@ export class AgentsAdminComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un admin
     this.currentUser = this.authService.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'admin') {
       this.authService.logout();
       return;
     }
 
     this.loadAgents();
+    this.loadMunicipalites();
   }
 
   loadAgents(): void {
-    this.agents = this.adminService.getAgents();
-    this.filteredAgents = [...this.agents];
+    console.log('Chargement des agents (admin)...');
+    this.adminService.getAgents().subscribe({
+      next: (response) => {
+        console.log('Réponse des agents (admin):', response);
+        console.log('Type de response:', typeof response);
+        console.log('response.content:', response.content);
+        console.log('Est un tableau:', Array.isArray(response.content));
+
+        if (response && response.content && Array.isArray(response.content)) {
+          this.agents = response.content;
+          console.log('Agents chargés (admin):', this.agents.length);
+        } else {
+          console.error('Structure de réponse invalide (admin agents):', response);
+          this.agents = [];
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des agents (admin):', error);
+        alert('Erreur lors du chargement des agents');
+      }
+    });
   }
 
-  filterAgents(): void {
-    let filtered = [...this.agents];
-
-    if (this.municipaliteFilter) {
-      filtered = filtered.filter(agent => agent.municipalite === this.municipaliteFilter);
-    }
-
-    if (this.statutFilter) {
-      filtered = filtered.filter(agent => agent.statut === this.statutFilter);
-    }
-
-    this.filteredAgents = filtered;
+  loadMunicipalites(): void {
+    this.adminService.getMunicipalitesForAgents().subscribe({
+      next: (response: any) => {
+        if (Array.isArray(response)) {
+          this.municipalites = response;
+        } else if (response && response.content && Array.isArray(response.content)) {
+          this.municipalites = response.content;
+        } else {
+          this.municipalites = [];
+        }
+      },
+      error: (error: any) => {
+        console.error('Erreur lors du chargement des municipalités:', error);
+        this.municipalites = [];
+      }
+    });
   }
 
-  clearFilters(): void {
-    this.municipaliteFilter = '';
-    this.statutFilter = '';
-    this.filteredAgents = [...this.agents];
+  onSubmitAgent(): void {
+    if (this.isSubmitting) return;
+    
+    this.isSubmitting = true;
+    
+    // Appel réel à l'API pour ajouter l'agent
+    this.adminService.ajouterAgent({
+      username: this.newAgent.username,
+      password: this.newAgent.password,
+      nom: this.newAgent.nom,
+      prenom: this.newAgent.prenom,
+      email: this.newAgent.email,
+      telephone: this.newAgent.telephone,
+      municipaliteId: this.newAgent.municipaliteId,
+      poste: this.newAgent.poste
+    }).subscribe({
+      next: (response: any) => {
+        console.log('Agent ajouté:', response);
+        
+        // Recharger les agents
+        this.loadAgents();
+        
+        // Réinitialiser le formulaire
+        this.resetNewAgent();
+        
+        // Fermer le formulaire
+        this.showAddForm = false;
+        
+        this.isSubmitting = false;
+        
+        alert('Agent ajouté avec succès !');
+      },
+      error: (error: any) => {
+        console.error('Erreur lors de l\'ajout de l\'agent:', error);
+        this.isSubmitting = false;
+        
+        let errorMessage = 'Erreur lors de l\'ajout de l\'agent. Veuillez réessayer.';
+        
+        if (error.status === 400) {
+          errorMessage = 'Données invalides. Vérifiez les informations saisies.';
+        } else if (error.status === 409) {
+          errorMessage = 'Un agent avec ce nom d\'utilisateur ou cet email existe déjà.';
+        } else if (error.status === 403) {
+          errorMessage = 'Vous n\'avez pas les permissions pour ajouter un agent.';
+        }
+        
+        alert(errorMessage);
+      }
+    });
+  }
+
+  resetNewAgent(): void {
+    this.newAgent = {
+      username: '',
+      password: '',
+      nom: '',
+      prenom: '',
+      email: '',
+      telephone: '',
+      municipaliteId: 0,
+      poste: ''
+    };
+  }
+
+  cancelAddAgent(): void {
+    this.showAddForm = false;
+    this.resetNewAgent();
   }
 
   getTotalAgents(): number {
@@ -68,11 +175,15 @@ export class AgentsAdminComponent implements OnInit {
   }
 
   viewAgent(agent: AgentMunicipal): void {
-    alert(`Détails de ${agent.prenom} ${agent.nom}\nMunicipalité: ${agent.municipalite}\nPoste: ${agent.poste}\nEmail: ${agent.email}\nTéléphone: ${agent.telephone}\nDate embauche: ${this.formatDate(agent.dateEmbauche)}\nRéclamations traitées: ${agent.nombreReclamationsTraitees}\nNote satisfaction: ${agent.noteSatisfaction}/5`);
+    this.selectedAgent = agent;
+    this.showModal = true;
   }
 
   editAgent(agent: AgentMunicipal): void {
-    alert(`🚧 Fonctionnalité d'édition en cours de développement\nAgent: ${agent.prenom} ${agent.nom}`);
+    console.log('Agent à modifier:', agent);
+    this.editingAgent = { ...agent }; // Créer une copie profonde
+    this.showEditModal = true;
+    console.log('Agent copié:', this.editingAgent);
   }
 
   updateAgentStatus(agentId: number, event: any): void {
@@ -85,6 +196,34 @@ export class AgentsAdminComponent implements OnInit {
         alert(`Statut de ${agent.prenom} ${agent.nom} mis à jour vers: ${this.getStatutLabel(nouveauStatut)}`);
       }
       event.target.value = ''; // Reset select
+    }
+  }
+
+  supprimerAgent(agent: AgentMunicipal): void {
+    const confirmation = confirm(`Êtes-vous sûr de vouloir supprimer définitivement l'agent ${agent.prenom} ${agent.nom} ?\n\nCette action est irréversible et supprimera toutes les données associées.`);
+    
+    if (confirmation) {
+      this.adminService.supprimerAgent(agent.id).subscribe({
+        next: (response: any) => {
+          console.log('Agent supprimé:', response);
+          alert(`L'agent ${agent.prenom} ${agent.nom} a été supprimé avec succès.`);
+          this.loadAgents(); // Recharger la liste
+        },
+        error: (error: any) => {
+          console.error('Erreur lors de la suppression de l\'agent:', error);
+          let errorMessage = 'Erreur lors de la suppression de l\'agent. Veuillez réessayer.';
+          
+          if (error.status === 500) {
+            errorMessage = 'Impossible de supprimer cet agent car il est responsable de projets. Veuillez d\'abord réassigner ses projets.';
+          } else if (error.status === 404) {
+            errorMessage = 'Agent non trouvé.';
+          } else if (error.status === 403) {
+            errorMessage = 'Vous n\'avez pas les permissions pour supprimer cet agent.';
+          }
+          
+          alert(errorMessage);
+        }
+      });
     }
   }
 
@@ -119,5 +258,36 @@ export class AgentsAdminComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  // Modal methods
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedAgent = null;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editingAgent = null;
+  }
+
+  onSaveAgentChanges(event: {type: string, data: any}): void {
+    console.log('Sauvegarde des modifications:', event);
+    
+    // Ici, vous pouvez ajouter l'appel API pour sauvegarder les modifications
+    // Pour l'instant, on simule la sauvegarde
+    this.isSubmitting = true;
+    
+    setTimeout(() => {
+      // Mettre à jour l'agent dans la liste locale
+      const index = this.agents.findIndex(a => a.id === event.data.id);
+      if (index !== -1) {
+        this.agents[index] = { ...this.agents[index], ...event.data };
+      }
+      
+      this.isSubmitting = false;
+      this.closeEditModal();
+      alert('Agent modifié avec succès !');
+    }, 1000);
   }
 }

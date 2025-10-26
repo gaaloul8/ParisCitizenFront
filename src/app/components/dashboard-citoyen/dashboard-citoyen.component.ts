@@ -15,8 +15,9 @@ export class DashboardCitoyenComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     
     // Vérifier que l'utilisateur est bien un citoyen
-    if (!this.currentUser || this.currentUser.role !== 'citoyen') {
-      // Rediriger vers la page de connexion si pas de citoyen
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'citoyen') {
+      console.log('Utilisateur non autorisé, redirection vers home');
+      // Rediriger vers la page d'accueil si pas de citoyen
       this.authService.logout();
     }
   }

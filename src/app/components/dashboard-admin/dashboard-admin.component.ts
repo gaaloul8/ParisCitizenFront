@@ -20,7 +20,7 @@ export class DashboardAdminComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     
     // Vérifier que l'utilisateur est bien un admin
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'admin') {
       // Rediriger vers la page de connexion si pas d'admin
       this.authService.logout();
       return;
@@ -30,7 +30,15 @@ export class DashboardAdminComponent implements OnInit {
   }
 
   loadStatistiques(): void {
-    this.statistiques = this.adminService.getStatistiquesGlobales();
+    this.adminService.getStatistiquesGlobales().subscribe({
+      next: (response) => {
+        this.statistiques = response;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des statistiques:', error);
+        alert('Erreur lors du chargement des statistiques');
+      }
+    });
   }
 
   getBarHeight(value: number): number {

@@ -135,18 +135,17 @@
             </span>
           </td>
           <td class="citoyen-actions">
-            <button class="btn btn-sm btn-info" (click)="viewCitoyen(citoyen)">
-              👁️ Voir
-            </button>
-            <button class="btn btn-sm btn-secondary" (click)="editCitoyen(citoyen)">
-              ✏️ Modifier
-            </button>
-            <select class="statut-select" (change)="updateCitoyenStatus(citoyen.id, $event)">
-              <option value="">Changer statut</option>
-              <option value="actif">Actif</option>
-              <option value="inactif">Inactif</option>
-              <option value="suspendu">Suspendu</option>
-            </select>
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-info" (click)="viewCitoyen(citoyen)" title="Voir les détails">
+                👁️
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="editCitoyen(citoyen)" title="Modifier">
+                ✏️
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="supprimerCitoyen(citoyen)" title="Supprimer">
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -162,3 +161,24 @@
     </div>
   </div>
 </div>
+
+<!-- Modal pour afficher les détails -->
+<app-detail-modal 
+  [isOpen]="showModal"
+  [data]="selectedCitoyen"
+  type="citoyen"
+  (closeModal)="closeModal()">
+</app-detail-modal>
+
+<!-- Modal pour modifier -->
+<app-edit-modal 
+  [isOpen]="showEditModal"
+  [data]="editingCitoyen"
+  type="citoyen"
+  (closeModal)="closeEditModal()"
+  (saveChanges)="onSaveCitoyenChanges($event)">
+</app-edit-modal>
+
+
+
+

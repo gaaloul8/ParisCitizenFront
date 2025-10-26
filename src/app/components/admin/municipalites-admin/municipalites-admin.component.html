@@ -198,18 +198,17 @@
             </span>
           </td>
           <td class="municipalite-actions">
-            <button class="btn btn-sm btn-info" (click)="viewMunicipalite(municipalite)">
-              👁️ Voir
-            </button>
-            <button class="btn btn-sm btn-secondary" (click)="editMunicipalite(municipalite)">
-              ✏️ Modifier
-            </button>
-            <select class="statut-select" (change)="updateMunicipaliteStatus(municipalite.id, $event)">
-              <option value="">Changer statut</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="maintenance">Maintenance</option>
-            </select>
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-info" (click)="viewMunicipalite(municipalite)" title="Voir les détails">
+                👁️
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="editMunicipalite(municipalite)" title="Modifier">
+                ✏️
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="supprimerMunicipalite(municipalite)" title="Supprimer">
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -225,3 +224,24 @@
     </div>
   </div>
 </div>
+
+<!-- Modal pour afficher les détails -->
+<app-detail-modal 
+  [isOpen]="showModal"
+  [data]="selectedMunicipalite"
+  type="municipalite"
+  (closeModal)="closeModal()">
+</app-detail-modal>
+
+<!-- Modal pour modifier -->
+<app-edit-modal 
+  [isOpen]="showEditModal"
+  [data]="editingMunicipalite"
+  type="municipalite"
+  (closeModal)="closeEditModal()"
+  (saveChanges)="onSaveMunicipaliteChanges($event)">
+</app-edit-modal>
+
+
+
+

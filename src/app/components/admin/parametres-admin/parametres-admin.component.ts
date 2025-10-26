@@ -29,7 +29,7 @@ export class ParametresAdminComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un admin
     this.currentUser = this.authService.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'admin') {
       this.authService.logout();
       return;
     }

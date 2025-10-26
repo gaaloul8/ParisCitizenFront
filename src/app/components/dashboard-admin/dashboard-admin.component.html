@@ -57,9 +57,9 @@
         <p style="color: var(--dark-color); margin: 0;">Supervision globale de la plateforme ParisCitizen</p>
       </div>
       <div class="user-info" *ngIf="currentUser">
-        <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
+        <div class="user-avatar">{{ (currentUser.prenom || currentUser.nom || currentUser.email || 'A').charAt(0).toUpperCase() }}</div>
         <div>
-          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.username }}</div>
+          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.prenom }} {{ currentUser.nom }}</div>
           <div style="font-size: 0.9rem; color: var(--dark-color);">Administrateur</div>
         </div>
       </div>

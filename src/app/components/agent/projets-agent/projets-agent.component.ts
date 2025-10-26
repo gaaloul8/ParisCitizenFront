@@ -33,7 +33,8 @@ export class ProjetsAgentComponent implements OnInit {
   ngOnInit(): void {
     // Vérifier que l'utilisateur est bien un agent
     this.currentUser = this.authService.getCurrentUser();
-    if (!this.currentUser || this.currentUser.role !== 'agent') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'agent') {
+      console.log('Utilisateur non autorisé, redirection vers home');
       this.authService.logout();
       return;
     }
@@ -42,8 +43,29 @@ export class ProjetsAgentComponent implements OnInit {
   }
 
   loadProjects(): void {
-    this.projets = this.agentService.getProjets();
-    this.filteredProjects = [...this.projets];
+    console.log('Chargement des projets (agent)...');
+    this.agentService.getProjets().subscribe({
+      next: (response) => {
+        console.log('Réponse des projets (agent):', response);
+        console.log('Type de response:', typeof response);
+        console.log('response.content:', response.content);
+        console.log('Est un tableau:', Array.isArray(response.content));
+        
+        if (response && response.content && Array.isArray(response.content)) {
+          this.projets = response.content;
+          this.filteredProjects = [...this.projets];
+          console.log('Projets chargés (agent):', this.projets.length);
+        } else {
+          console.error('Structure de réponse invalide (agent):', response);
+          this.projets = [];
+          this.filteredProjects = [];
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des projets (agent):', error);
+        alert('Erreur lors du chargement des projets');
+      }
+    });
   }
 
   filterProjects(): void {
@@ -64,31 +86,42 @@ export class ProjetsAgentComponent implements OnInit {
     
     this.isSubmitting = true;
     
-    // Simuler la création du projet
-    setTimeout(() => {
-      const nouveauProjet = this.agentService.ajouterProjet({
-        titre: this.newProject.titre,
-        description: this.newProject.description,
-        dateCreation: new Date().toISOString().split('T')[0],
-        dateDebut: this.newProject.dateDebut,
-        dateFin: this.newProject.dateFin,
-        statut: 'brouillon',
-        budget: this.newProject.budget,
-        responsable: this.newProject.responsable,
-        participants: 0,
-        arrondissement: this.currentUser?.commune || '15ème'
-      });
-
-      // Recharger les projets
-      this.loadProjects();
-      
-      // Réinitialiser le formulaire
-      this.resetNewProject();
-      
-      this.isSubmitting = false;
-      
-      alert('Projet créé avec succès !');
-    }, 1000);
+    // Créer le projet via l'API
+    this.agentService.ajouterProjet({
+      titre: this.newProject.titre,
+      description: this.newProject.description,
+      dateCreation: new Date().toISOString().split('T')[0],
+      dateDebut: this.newProject.dateDebut,
+      dateFin: this.newProject.dateFin,
+      statut: 'brouillon',
+      budget: this.newProject.budget,
+      responsable: this.newProject.responsable,
+      participants: 0,
+      arrondissement: this.currentUser?.commune || '15ème',
+      localisation: this.currentUser?.commune || '15ème arrondissement',
+      objectifs: '',
+      beneficiaires: ''
+    }).subscribe({
+      next: (nouveauProjet) => {
+        console.log('Projet créé avec succès:', nouveauProjet);
+        
+        // Recharger les projets
+        this.loadProjects();
+        
+        // Réinitialiser le formulaire
+        this.resetNewProject();
+        
+        this.isSubmitting = false;
+        this.showCreateForm = false;
+        
+        alert('Projet créé avec succès !');
+      },
+      error: (error) => {
+        console.error('Erreur lors de la création du projet:', error);
+        this.isSubmitting = false;
+        alert('Erreur lors de la création du projet. Veuillez réessayer.');
+      }
+    });
   }
 
   resetNewProject(): void {

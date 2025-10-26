@@ -51,9 +51,9 @@
         <p style="color: var(--dark-color); margin: 0;">Gestion des signalements et projets de votre arrondissement</p>
       </div>
       <div class="user-info" *ngIf="currentUser">
-        <div class="user-avatar">{{ currentUser.username.charAt(0).toUpperCase() }}</div>
+        <div class="user-avatar">{{ (currentUser.prenom || currentUser.nom || currentUser.email || 'A').charAt(0).toUpperCase() }}</div>
         <div>
-          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.username }}</div>
+          <div style="font-weight: 600; color: var(--primary-color);">{{ currentUser.prenom }} {{ currentUser.nom }}</div>
           <div style="font-size: 0.9rem; color: var(--dark-color);">Agent municipal</div>
         </div>
       </div>
@@ -195,3 +195,6 @@
     </div>
   </div>
 </div>
+
+
+

@@ -11,6 +11,7 @@ export class DashboardAgentComponent implements OnInit {
   currentUser: User | null = null;
   statistiques: StatistiquesAgent | null = null;
   showCreateProject = false;
+  reclamations: any[] = [];
 
   constructor(
     private authService: AuthService,
@@ -21,17 +22,37 @@ export class DashboardAgentComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     
     // Vérifier que l'utilisateur est bien un agent
-    if (!this.currentUser || this.currentUser.role !== 'agent') {
+    if (!this.currentUser || this.currentUser.role?.toLowerCase() !== 'agent') {
       // Rediriger vers la page de connexion si pas d'agent
       this.authService.logout();
       return;
     }
 
     this.loadStatistiques();
+    this.loadReclamations();
   }
 
   loadStatistiques(): void {
-    this.statistiques = this.agentService.getStatistiques();
+    this.agentService.getStatistiques().subscribe({
+      next: (response) => {
+        this.statistiques = response;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des statistiques:', error);
+        alert('Erreur lors du chargement des statistiques');
+      }
+    });
+  }
+
+  loadReclamations(): void {
+    this.agentService.getReclamations().subscribe({
+      next: (response) => {
+        this.reclamations = response.content;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des réclamations:', error);
+      }
+    });
   }
 
   getTauxTraitement(): number {
@@ -42,7 +63,7 @@ export class DashboardAgentComponent implements OnInit {
   }
 
   getNouvellesReclamations(): number {
-    return this.agentService.getReclamationsByStatut('nouvelle').length;
+    return this.reclamations.filter(r => r.statut === 'nouvelle').length;
   }
 
   getBarHeight(value: number): number {

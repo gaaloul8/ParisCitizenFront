@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -22,6 +23,8 @@ import { MunicipalitesAdminComponent } from './components/admin/municipalites-ad
 import { AgentsAdminComponent } from './components/admin/agents-admin/agents-admin.component';
 import { CitoyensAdminComponent } from './components/admin/citoyens-admin/citoyens-admin.component';
 import { ParametresAdminComponent } from './components/admin/parametres-admin/parametres-admin.component';
+import { DetailModalComponent } from './components/shared/detail-modal/detail-modal.component';
+import { EditModalComponent } from './components/shared/edit-modal/edit-modal.component';
 
 @NgModule({
   declarations: [
@@ -43,13 +46,16 @@ import { ParametresAdminComponent } from './components/admin/parametres-admin/pa
     MunicipalitesAdminComponent,
     AgentsAdminComponent,
     CitoyensAdminComponent,
-    ParametresAdminComponent
+    ParametresAdminComponent,
+    DetailModalComponent,
+    EditModalComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

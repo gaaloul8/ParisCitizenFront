@@ -1,0 +1,272 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="modal-icon">
+          <ng-container [ngSwitch]="type">
+            <span *ngSwitchCase="'citoyen'">👤</span>
+            <span *ngSwitchCase="'agent'">👥</span>
+            <span *ngSwitchCase="'municipalite'">🏛️</span>
+          </ng-container>
+        </span>
+        <h2>
+          <ng-container [ngSwitch]="type">
+            <span *ngSwitchCase="'citoyen'">Détails du Citoyen</span>
+            <span *ngSwitchCase="'agent'">Détails de l'Agent</span>
+            <span *ngSwitchCase="'municipalite'">Détails de la Municipalité</span>
+          </ng-container>
+        </h2>
+      </div>
+      <button class="close-btn" (click)="onClose()">
+        <span>×</span>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="modal-content">
+      
+      <!-- Citoyen Details -->
+      <div *ngIf="type === 'citoyen' && getCitoyenData()" class="detail-section">
+        <div class="detail-card">
+          <div class="detail-header">
+            <div class="avatar">
+              <span>{{ getCitoyenData()!.prenom.charAt(0) }}{{ getCitoyenData()!.nom.charAt(0) }}</span>
+            </div>
+            <div class="header-info">
+              <h3>{{ getCitoyenData()!.prenom }} {{ getCitoyenData()!.nom }}</h3>
+              <p class="subtitle">{{ getCitoyenData()!.commune }}</p>
+              <span class="statut-badge" [ngClass]="getStatutClass(getCitoyenData()!.statut)">
+                {{ getStatutLabel(getCitoyenData()!.statut) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">📧 Email</div>
+              <div class="detail-value">{{ getCitoyenData()!.email }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">🎂 Âge</div>
+              <div class="detail-value">{{ getCitoyenData()!.age }} ans</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">📅 Date d'inscription</div>
+              <div class="detail-value">{{ formatDate(getCitoyenData()!.dateInscription) }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">🕒 Dernière activité</div>
+              <div class="detail-value">{{ formatDate(getCitoyenData()!.derniereActivite) }}</div>
+            </div>
+          </div>
+          
+          <div class="stats-section">
+            <h4>📊 Statistiques</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getCitoyenData()!.nombreReclamations }}</div>
+                  <div class="stat-label">Réclamations</div>
+                </div>
+                <div class="stat-badge" [ngClass]="getBadgeClass(getCitoyenData()!.nombreReclamations)">
+                  {{ getCitoyenData()!.nombreReclamations }}
+                </div>
+              </div>
+              
+              <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getCitoyenData()!.nombreProjetsParticipes }}</div>
+                  <div class="stat-label">Projets participés</div>
+                </div>
+                <div class="stat-badge badge-projets">
+                  {{ getCitoyenData()!.nombreProjetsParticipes }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Details -->
+      <div *ngIf="type === 'agent' && getAgentData()" class="detail-section">
+        <div class="detail-card">
+          <div class="detail-header">
+            <div class="avatar">
+              <span>{{ getAgentData()!.prenom.charAt(0) }}{{ getAgentData()!.nom.charAt(0) }}</span>
+            </div>
+            <div class="header-info">
+              <h3>{{ getAgentData()!.prenom }} {{ getAgentData()!.nom }}</h3>
+              <p class="subtitle">{{ getAgentData()!.poste }} - {{ getAgentData()!.municipalite }}</p>
+              <span class="statut-badge" [ngClass]="getStatutClass(getAgentData()!.statut)">
+                {{ getStatutLabel(getAgentData()!.statut) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">📧 Email</div>
+              <div class="detail-value">{{ getAgentData()!.email }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">📞 Téléphone</div>
+              <div class="detail-value">{{ getAgentData()!.telephone }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">🏛️ Municipalité</div>
+              <div class="detail-value">{{ getAgentData()!.municipalite }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">💼 Poste</div>
+              <div class="detail-value">{{ getAgentData()!.poste }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">📅 Date d'embauche</div>
+              <div class="detail-value">{{ formatDate(getAgentData()!.dateEmbauche) }}</div>
+            </div>
+          </div>
+          
+          <div class="stats-section">
+            <h4>📊 Performance</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getAgentData()!.nombreReclamationsTraitees }}</div>
+                  <div class="stat-label">Réclamations traitées</div>
+                </div>
+                <div class="stat-badge badge-success">
+                  {{ getAgentData()!.nombreReclamationsTraitees }}
+                </div>
+              </div>
+              
+              <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getAgentData()!.noteSatisfaction }}/5</div>
+                  <div class="stat-label">Note satisfaction</div>
+                </div>
+                <div class="note-stars">
+                  <span *ngFor="let star of getStars(getAgentData()!.noteSatisfaction)" class="star">{{ star }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Municipalité Details -->
+      <div *ngIf="type === 'municipalite' && getMunicipaliteData()" class="detail-section">
+        <div class="detail-card">
+          <div class="detail-header">
+            <div class="avatar municipalite-avatar">
+              <span>🏛️</span>
+            </div>
+            <div class="header-info">
+              <h3>{{ getMunicipaliteData()!.nom }}</h3>
+              <p class="subtitle">{{ getMunicipaliteData()!.region }} - {{ getMunicipaliteData()!.codePostal }}</p>
+              <span class="statut-badge" [ngClass]="getStatutClass(getMunicipaliteData()!.statut)">
+                {{ getStatutLabel(getMunicipaliteData()!.statut) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">🏛️ Nom</div>
+              <div class="detail-value">{{ getMunicipaliteData()!.nom }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">🗺️ Région</div>
+              <div class="detail-value">{{ getMunicipaliteData()!.region }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">📮 Code Postal</div>
+              <div class="detail-value">{{ getMunicipaliteData()!.codePostal }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">💰 Budget Annuel</div>
+              <div class="detail-value budget-value">{{ formatCurrency(getMunicipaliteData()!.budgetAnnuel) }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">📅 Date de création</div>
+              <div class="detail-value">{{ formatDate(getMunicipaliteData()!.dateCreation) }}</div>
+            </div>
+          </div>
+          
+          <div class="stats-section">
+            <h4>📊 Statistiques</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getMunicipaliteData()!.nombreAgents }}</div>
+                  <div class="stat-label">Agents</div>
+                </div>
+                <div class="stat-badge badge-info">
+                  {{ getMunicipaliteData()!.nombreAgents }}
+                </div>
+              </div>
+              
+              <div class="stat-card">
+                <div class="stat-icon">👤</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getMunicipaliteData()!.nombreCitoyens | number }}</div>
+                  <div class="stat-label">Citoyens</div>
+                </div>
+                <div class="stat-badge badge-primary">
+                  {{ getMunicipaliteData()!.nombreCitoyens | number }}
+                </div>
+              </div>
+              
+              <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getMunicipaliteData()!.nombreProjets }}</div>
+                  <div class="stat-label">Projets</div>
+                </div>
+                <div class="stat-badge badge-projets">
+                  {{ getMunicipaliteData()!.nombreProjets }}
+                </div>
+              </div>
+              
+              <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ getMunicipaliteData()!.tauxSatisfaction }}%</div>
+                  <div class="stat-label">Satisfaction</div>
+                </div>
+                <div class="satisfaction-bar">
+                  <div class="satisfaction-fill" [style.width.%]="getMunicipaliteData()!.tauxSatisfaction"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

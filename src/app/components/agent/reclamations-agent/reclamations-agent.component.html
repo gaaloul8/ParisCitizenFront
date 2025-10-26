@@ -110,9 +110,13 @@
           <td class="reclamation-id">#{{ reclamation.id }}</td>
           <td class="reclamation-sujet">{{ reclamation.sujet }}</td>
           <td class="reclamation-citoyen">
-            <div class="citoyen-info">
+            <div class="citoyen-info" *ngIf="reclamation.citoyen">
               <div class="citoyen-nom">{{ reclamation.citoyen.prenom }} {{ reclamation.citoyen.nom }}</div>
               <div class="citoyen-email">{{ reclamation.citoyen.email }}</div>
+            </div>
+            <div class="citoyen-info" *ngIf="!reclamation.citoyen">
+              <div class="citoyen-nom">Informations non disponibles</div>
+              <div class="citoyen-email">-</div>
             </div>
           </td>
           <td class="reclamation-type">
@@ -127,7 +131,7 @@
           </td>
           <td class="reclamation-date">{{ formatDate(reclamation.dateCreation) }}</td>
           <td class="reclamation-statut">
-            <span class="statut-badge" [ngClass]="'statut-' + reclamation.statut">
+            <span class="statut-badge" [ngClass]="getStatutClass(reclamation.statut)">
               {{ getStatutLabel(reclamation.statut) }}
             </span>
           </td>
@@ -135,14 +139,8 @@
             <button class="btn btn-sm btn-info" (click)="viewReclamation(reclamation)">
               👁️ Voir
             </button>
-            <button 
-              class="btn btn-sm btn-success" 
-              *ngIf="reclamation.statut !== 'traitee'"
-              (click)="markAsTreated(reclamation.id)">
-              ✅ Traiter
-            </button>
             <select class="statut-select" (change)="updateReclamationStatus(reclamation.id, $event)">
-              <option value="">Changer</option>
+              <option value="">Changer statut</option>
               <option value="nouvelle">Nouvelle</option>
               <option value="en_cours">En cours</option>
               <option value="traitee">Traité</option>
@@ -194,14 +192,30 @@
             </div>
             <div class="detail-item">
               <label>Statut :</label>
-              <span class="statut-badge" [ngClass]="'statut-' + selectedReclamation.statut">
-                {{ getStatutLabel(selectedReclamation.statut) }}
-              </span>
+              <div class="statut-container">
+                <span class="statut-badge" [ngClass]="getStatutClass(selectedReclamation.statut)">
+                  {{ getStatutLabel(selectedReclamation.statut) }}
+                </span>
+                <div class="statut-selector">
+                  <select #modalStatutSelect class="form-select form-select-sm">
+                    <option *ngFor="let option of getStatutOptions()" 
+                            [value]="option.value" 
+                            [selected]="option.value === selectedReclamation.statut">
+                      {{ option.label }}
+                    </option>
+                  </select>
+                  <button class="btn btn-sm btn-primary" 
+                          (click)="updateStatut(selectedReclamation, modalStatutSelect.value)"
+                          [disabled]="modalStatutSelect.value === selectedReclamation.statut">
+                    Modifier
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="detail-section">
+        <div class="detail-section" *ngIf="selectedReclamation.citoyen">
           <h4>👤 Informations citoyen</h4>
           <div class="detail-grid">
             <div class="detail-item">
@@ -211,6 +225,20 @@
             <div class="detail-item">
               <label>Email :</label>
               <span>{{ selectedReclamation.citoyen.email }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-section" *ngIf="!selectedReclamation.citoyen">
+          <h4>👤 Informations citoyen</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nom :</label>
+              <span>Informations non disponibles</span>
+            </div>
+            <div class="detail-item">
+              <label>Email :</label>
+              <span>-</span>
             </div>
           </div>
         </div>
@@ -263,3 +291,6 @@
     </div>
   </div>
 </div>
+
+
+
