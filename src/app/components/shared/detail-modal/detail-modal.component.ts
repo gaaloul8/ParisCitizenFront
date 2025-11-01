@@ -120,3 +120,5 @@ export class DetailModalComponent implements OnInit {
     return 'badge-high';
   }
 }
+
+

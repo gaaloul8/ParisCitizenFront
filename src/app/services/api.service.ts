@@ -21,7 +21,7 @@ export interface PageResponse<T> {
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8083/api/v1';
+  private baseUrl = 'http://48.194.74.73:8083/api/v1';
 
   constructor(private http: HttpClient) {}
 

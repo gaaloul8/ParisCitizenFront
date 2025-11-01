@@ -21,3 +21,5 @@ describe('DetailModalComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
+

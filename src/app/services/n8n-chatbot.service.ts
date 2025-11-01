@@ -20,9 +20,9 @@ export interface N8nChatbotResponse {
   providedIn: 'root'
 })
 export class N8nChatbotService {
-  private n8nWebhookUrlReclamation = 'http://localhost:5678/webhook-test/chatbot3';
-  private n8nWebhookUrlProjet = 'http://localhost:5678/webhook-test/chatbot2';
-  private n8nWebhookUrlEtablissement = 'http://localhost:5678/webhook-test/chatbot1';
+  private n8nWebhookUrlReclamation = 'https://azizgaaloul.app.n8n.cloud/webhook/chatbot3';
+  private n8nWebhookUrlProjet = 'https://azizgaaloul.app.n8n.cloud/webhook/chatbot2';
+  private n8nWebhookUrlEtablissement = 'https://azizgaaloul.app.n8n.cloud/webhook/chatbot1';
 
   constructor(private http: HttpClient) {}
 
